@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Parth AI - Gemini Pro UI</title>
+  <title>Parth AI</title>
 
   <!-- Favicon generated from SVG Logo -->
   <link rel="icon" type="image/svg+xml"
@@ -783,8 +783,8 @@
     <div class="input-wrapper">
       <div class="input-container">
         <!-- FIX: Added aria-label="Message input field" to fix A11y form warning -->
-        <textarea id="userInput" aria-label="Message input field" rows="1"
-          placeholder="Ask anything or say 'imagine a futuristic city'..." autocomplete="off"></textarea>
+        <!-- Placeholder text starts empty, JS will handle the typing animation -->
+        <textarea id="userInput" aria-label="Message input field" rows="1" placeholder="" autocomplete="off"></textarea>
         <button class="send-btn" id="sendBtn" onclick="handleSend()" aria-label="Send Message">
           <span class="material-symbols-outlined">send</span>
         </button>
@@ -812,6 +812,48 @@
     const selectItems = document.getElementById('selectItems');
     const selectedModelText = document.getElementById('selectedModelText');
     let isGenerating = false;
+
+    // ===== Typewriter Placeholder Logic =====
+    const placeholderPhrases = [
+      "Say hello...",
+      "Imagine a futuristic city...",
+      "Write a short poem...",
+      "Draw a flying car...",
+      "Tell me a joke..."
+    ];
+    let phraseIndex = 0;
+    let charIndex = 0;
+    let isDeletingPlaceholder = false;
+
+    function typeWriterPlaceholder() {
+      const currentText = placeholderPhrases[phraseIndex];
+
+      if (isDeletingPlaceholder) {
+        userInput.setAttribute("placeholder", currentText.substring(0, charIndex - 1));
+        charIndex--;
+      } else {
+        userInput.setAttribute("placeholder", currentText.substring(0, charIndex + 1));
+        charIndex++;
+      }
+
+      // Typing speed: normal vs deleting
+      let speed = isDeletingPlaceholder ? 40 : 80;
+
+      // Pause at the end of the phrase for 2 seconds
+      if (!isDeletingPlaceholder && charIndex === currentText.length) {
+        speed = 2000;
+        isDeletingPlaceholder = true;
+      } else if (isDeletingPlaceholder && charIndex === 0) {
+        isDeletingPlaceholder = false;
+        phraseIndex = (phraseIndex + 1) % placeholderPhrases.length;
+        speed = 400; // Pause before typing the next phrase
+      }
+
+      setTimeout(typeWriterPlaceholder, speed);
+    }
+
+    // Start the placeholder typewriter effect
+    typeWriterPlaceholder();
 
     // ===== Dynamic UI Logic =====
     userInput.addEventListener('input', function () {
