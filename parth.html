@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parth AI</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: radial-gradient(circle at top, #1b1b2f, #0d0d17);
+    color: #eee;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .app {
+    width: 420px;
+    max-width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    box-shadow: 0 0 40px rgba(127,90,240,0.2);
+  }
+
+  header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+
+  .logo-container { width: 110px; height: 110px; }
+
+  #rotor { transform-origin: 100px 100px; animation: spin 6s linear infinite; }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+  .core { animation: pulse 2.5s ease-in-out infinite; transform-origin: 100px 100px; }
+  @keyframes pulse { 0%,100% { filter: drop-shadow(0 0 5px #7F5AF0); } 50% { filter: drop-shadow(0 0 18px #2CB1BC); } }
+
+  h1 {
+    margin-top: 8px;
+    font-size: 1.6rem;
+    letter-spacing: 1px;
+  }
+  h1 span {
+    background: linear-gradient(90deg, #7F5AF0, #2CB1BC);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 800;
+  }
+
+  .chat-window {
+    height: 320px;
+    overflow-y: auto;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .message {
+    padding: 10px 14px;
+    border-radius: 14px;
+    max-width: 80%;
+    line-height: 1.4;
+    font-size: 0.95rem;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn { from {opacity:0; transform: translateY(6px);} to {opacity:1; transform: translateY(0);} }
+
+  .ai {
+    background: linear-gradient(135deg, #2b2b45, #1b1b2f);
+    align-self: flex-start;
+    border: 1px solid rgba(127,90,240,0.3);
+  }
+
+  .user {
+    background: linear-gradient(135deg, #7F5AF0, #2CB1BC);
+    align-self: flex-end;
+    color: #fff;
+  }
+
+  .input-area {
+    display: flex;
+    gap: 8px;
+  }
+
+  input {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    outline: none;
+  }
+
+  button {
+    padding: 12px 18px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #7F5AF0, #2CB1BC);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  button:hover { transform: scale(1.05); }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <div class="logo-container">
+      <svg viewBox="0 0 200 200" width="100%" height="100%">
+        <defs>
+          <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#7F5AF0"/>
+            <stop offset="100%" stop-color="#2CB1BC"/>
+          </linearGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+
+        <!-- Rotating ring + dots -->
+        <g id="rotor">
+          <circle cx="100" cy="100" r="95" fill="none" stroke="url(#grad1)" stroke-width="2" stroke-dasharray="10 8" opacity="0.7"/>
+          <circle cx="100" cy="5" r="6" fill="#7F5AF0"/>
+          <circle cx="195" cy="100" r="4" fill="#2CB1BC"/>
+          <circle cx="100" cy="195" r="5" fill="#7F5AF0"/>
+          <circle cx="5" cy="100" r="4" fill="#2CB1BC"/>
+        </g>
+
+        <!-- Static core with P -->
+        <g class="core">
+          <circle cx="100" cy="100" r="68" fill="url(#grad1)" filter="url(#glow)"/>
+          <text x="100" y="132" font-size="85" font-family="Segoe UI, sans-serif" font-weight="800" fill="#fff" text-anchor="middle">P</text>
+        </g>
+      </svg>
+    </div>
+    <h1>Parth<span>AI</span></h1>
+  </header>
+
+  <div class="chat-window" id="chatWindow">
+    <div class="message ai">Hey! I'm Parth AI 👋 Ask me anything.</div>
+  </div>
+
+  <div class="input-area">
+    <input id="userInput" placeholder="Type a message..." onkeypress="if(event.key==='Enter') sendMessage()">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
+
+<script>
+const chatWindow = document.getElementById('chatWindow');
+const userInput = document.getElementById('userInput');
+
+function addMessage(text, sender) {
+  const div = document.createElement('div');
+  div.className = `message ${sender}`;
+  div.textContent = text;
+  chatWindow.appendChild(div);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+}
+
+function sendMessage() {
+  const text = userInput.value.trim();
+  if (!text) return;
+  addMessage(text, 'user');
+  userInput.value = '';
+
+  setTimeout(() => {
+    addMessage(getAIResponse(text), 'ai');
+  }, 500);
+}
+
+// 🔧 Replace this with a real API call (OpenAI, Gemini, etc.) when ready
+function getAIResponse(input) {
+  const responses = [
+    "That's interesting! Tell me more.",
+    "I'm just a demo brain right now — plug in a real API to make me smarter 🧠",
+    "Great question! Let's explore that.",
+    `You said: "${input}" — noted!`,
+  ];
+  return responses[Math.floor(Math.random() * responses.length)];
+}
+</script>
+
+</body>
+</html>
