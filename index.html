@@ -6,9 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Parth AI</title>
 
-  <!-- Favicon generated from SVG Logo -->
+  <!-- Favicon generated from SVG Logo (Pinwheel) with softer gradient -->
   <link rel="icon" type="image/svg+xml"
-    href="data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z' fill='%23A8C7FA'/%3E%3C/svg%3E">
+    href="data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' stroke='%23A8C7FA' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M22 12a1 1 0 0 1-10 0 1 1 0 0 0-10 0'/%3E%3Cpath d='M7 20.7a1 1 0 1 1 5-8.7 1 1 0 1 0 5-8.6'/%3E%3Cpath d='M7 3.3a1 1 0 1 1 5 8.6 1 1 0 1 0 5 8.6'/%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3C/svg%3E">
 
   <!-- Google Fonts & Material Symbols -->
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -91,6 +91,9 @@
       --overlay: rgba(0, 0, 0, 0.3);
       --scrollbar-thumb: #C4C7C5;
       --modal-bg: #FFFFFF;
+      /* Hero Gradient Light */
+      --hero-grad-1: #0A56D0;
+      --hero-grad-2: #0842A0;
     }
 
     [data-theme="dark"] {
@@ -111,6 +114,9 @@
       --overlay: rgba(0, 0, 0, 0.6);
       --scrollbar-thumb: #444746;
       --modal-bg: #1E1F20;
+      /* Hero Gradient Dark */
+      --hero-grad-1: #A8C7FA;
+      --hero-grad-2: #D3E3FD;
     }
 
     /* ===== Animated Background Gradients ===== */
@@ -130,7 +136,6 @@
       flex-direction: column;
       animation: ambientFlow 14s ease-in-out infinite alternate;
       will-change: background-position;
-      /* GPU Optimization */
     }
 
     @keyframes ambientFlow {
@@ -216,7 +221,6 @@
       opacity: 0;
       visibility: hidden;
       transition: 0.3s ease;
-      /* Blur Effect added here */
       backdrop-filter: blur(0px);
       -webkit-backdrop-filter: blur(0px);
     }
@@ -278,7 +282,7 @@
       position: relative;
     }
 
-    /* GREETING HERO */
+    /* GREETING HERO & Animated SVG Logo */
     .greeting-screen {
       display: flex;
       flex-direction: column;
@@ -291,18 +295,27 @@
       transition: opacity 0.3s ease;
     }
 
+    /* FIX: Rotation now controlled by JS via inline style for click/tap.
+       Transition is slower (2.5s) and uses ease-in-out for slow start/stop. */
+    .hero-logo-container {
+      width: 72px;
+      height: 72px;
+      margin-bottom: 16px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 2.5s ease-in-out;
+    }
+
     .greeting-title {
       font-size: 3.2rem;
       font-weight: 500;
-      background: linear-gradient(90deg, #A8C7FA, #D3E3FD);
+      background: linear-gradient(90deg, var(--hero-grad-1), var(--hero-grad-2));
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
+      color: transparent;
       margin-bottom: 12px;
       letter-spacing: -1px;
-    }
-
-    [data-theme="light"] .greeting-title {
-      background: linear-gradient(90deg, #0A56D0, #0842A0);
     }
 
     .greeting-subtitle {
@@ -589,7 +602,6 @@
       position: relative;
     }
 
-    /* FIX: Changed <label> to <div class="setting-label"> to fix Lighthouse A11y Error */
     .setting-label {
       display: block;
       margin-bottom: 12px;
@@ -685,18 +697,22 @@
   <!-- Base Gradient Definitions for SVGs -->
   <svg style="position: absolute; width: 0; height: 0;" aria-hidden="true">
     <defs>
+      <!-- FIX: Adjusted stop color to #669DF6 for a softer, more subtle gradient -->
       <linearGradient id="paint0_linear" x1="2" y1="12" x2="22" y2="12" gradientUnits="userSpaceOnUse">
         <stop stop-color="#A8C7FA" />
-        <stop offset="1" stop-color="#0A56D0" />
+        <stop offset="1" stop-color="#669DF6" />
       </linearGradient>
     </defs>
   </svg>
 
-  <!-- Raw SVG Logo String for re-use without <use> bugs -->
+  <!-- NEW Raw SVG Logo String (Pinwheel) for re-use without <use> bugs -->
   <script>
     const svgLogoRaw = `
-    <svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" fill="url(#paint0_linear)"/>
+    <svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="url(#paint0_linear)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M22 12a1 1 0 0 1-10 0 1 1 0 0 0-10 0"/>
+      <path d="M7 20.7a1 1 0 1 1 5-8.7 1 1 0 1 0 5-8.6"/>
+      <path d="M7 3.3a1 1 0 1 1 5 8.6 1 1 0 1 0 5 8.6"/>
+      <circle cx="12" cy="12" r="10"/>
     </svg>
   `;
   </script>
@@ -731,7 +747,6 @@
       </div>
 
       <div class="modal-group">
-        <!-- FIX: Replaced <label> with <div class="setting-label"> -->
         <div class="setting-label">Select Brain (Text Model)</div>
         <div class="custom-select">
           <div class="select-selected" id="selectSelected" onclick="toggleDropdown()" role="button" tabindex="0"
@@ -755,10 +770,9 @@
   <header>
     <div class="header-left">
       <button class="icon-btn" onclick="toggleSidebar()" aria-label="Open Menu">
-        <span class="material-symbols-outlined">menu</span>
+        <span class="material-symbols-outlined">segment</span>
       </button>
       <div class="app-logo">
-        <div style="width: 28px; height: 28px;" id="headerLogoContainer"></div>
         <div class="logo-text">Parth AI</div>
       </div>
     </div>
@@ -771,6 +785,8 @@
   <div class="chat-container" id="chatContainer">
     <!-- Centered Greeting Hero -->
     <div class="greeting-screen" id="greetingScreen">
+      <!-- Clickable/Tappable Hero Logo -->
+      <div class="hero-logo-container" id="heroLogoContainer"></div>
       <h1 class="greeting-title">Hello</h1>
       <p class="greeting-subtitle">How can I help you today?</p>
     </div>
@@ -782,8 +798,6 @@
   <div class="input-area">
     <div class="input-wrapper">
       <div class="input-container">
-        <!-- FIX: Added aria-label="Message input field" to fix A11y form warning -->
-        <!-- Placeholder text starts empty, JS will handle the typing animation -->
         <textarea id="userInput" aria-label="Message input field" rows="1" placeholder="" autocomplete="off"></textarea>
         <button class="send-btn" id="sendBtn" onclick="handleSend()" aria-label="Send Message">
           <span class="material-symbols-outlined">send</span>
@@ -793,9 +807,9 @@
   </div>
 
   <script>
-    // Insert initial SVGs cleanly
+    // Insert initial SVGs
     document.getElementById('sidebarLogoContainer').innerHTML = svgLogoRaw;
-    document.getElementById('headerLogoContainer').innerHTML = svgLogoRaw;
+    document.getElementById('heroLogoContainer').innerHTML = svgLogoRaw;
 
     // Elements
     const chatContainer = document.getElementById('chatContainer');
@@ -806,6 +820,14 @@
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
     const settingsModal = document.getElementById('settingsModal');
+
+    // FIX: Hero Logo Click Rotation Logic
+    const heroLogo = document.getElementById('heroLogoContainer');
+    let heroRotation = 0;
+    heroLogo.addEventListener('click', () => {
+      heroRotation += 360;
+      heroLogo.style.transform = `rotate(${heroRotation}deg)`;
+    });
 
     // Custom Dropdown State
     let activeModel = 'openai';
