@@ -751,7 +751,7 @@
       visibility: visible;
     }
 
-    /* ===== NEW: Maximized Input Area ===== */
+    /* ===== NEW: Permanent Double-Story Input Area ===== */
     .input-area {
       width: 100%;
       display: flex;
@@ -802,42 +802,43 @@
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
-    /* Smart Dynamic Input Container */
+    /* Fixed Always Expanded Container */
     .input-container {
       display: flex;
       flex-direction: column;
       background: var(--surface);
-      border-radius: 24px;
-      padding: 10px 14px;
-      transition: all 0.3s ease;
+      border-radius: 16px;
+      padding: 12px 14px;
+      transition: border 0.3s ease, box-shadow 0.3s ease;
       border: 1px solid transparent;
     }
 
     .input-container:focus-within {
-      background: var(--surface-hover);
       border: 1px solid var(--border);
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+      background: var(--surface-hover);
     }
 
-    /* Textarea uses 100% width now */
+    /* Textarea takes top row */
     textarea {
       width: 100%;
       background: transparent;
       border: none;
-      padding: 6px 4px 10px 4px;
+      padding: 0 4px 10px 4px;
       font-size: 1.05rem;
       color: var(--text-main);
       resize: none;
       max-height: 200px;
       overflow-y: auto;
       line-height: 1.5;
+      outline: none;
     }
 
     textarea::placeholder {
       color: var(--text-muted);
     }
 
-    /* Bottom Actions Row under Textarea */
+    /* Actions take bottom row */
     .input-bottom-row {
       display: flex;
       justify-content: space-between;
@@ -845,10 +846,14 @@
       width: 100%;
     }
 
-    .left-actions,
+    .left-actions {
+      display: flex;
+      align-items: center;
+    }
+
     .right-actions {
       display: flex;
-      gap: 8px;
+      gap: 4px;
       align-items: center;
     }
 
@@ -856,8 +861,8 @@
       background: transparent;
       border: none;
       color: var(--text-muted);
-      width: 40px;
-      height: 40px;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
       display: flex;
       justify-content: center;
@@ -892,11 +897,11 @@
     }
 
     .send-btn {
-      background: transparent;
-      color: var(--text-muted);
+      background: var(--primary);
+      color: var(--bg-color);
       border: none;
-      width: 40px;
-      height: 40px;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
       display: flex;
       justify-content: center;
@@ -904,16 +909,13 @@
       cursor: pointer;
       transition: 0.2s;
       flex-shrink: 0;
+      opacity: 0.5;
+      pointer-events: none;
     }
 
     .send-btn.active {
-      color: var(--primary);
-      background: var(--primary-light);
-      color: var(--bg-color);
-    }
-
-    [data-theme="dark"] .send-btn.active {
-      color: var(--bg-color);
+      opacity: 1;
+      pointer-events: all;
     }
 
     .send-btn:active {
@@ -1218,7 +1220,6 @@
         <div style="width: 28px; height: 28px;" id="sidebarLogoContainer"></div>
         <div class="logo-text">Looper AI</div>
       </div>
-      <!-- Back Arrow for Sidebar -->
       <button class="icon-btn" onclick="toggleSidebar()" style="width: 32px; height: 32px;">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
           stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1227,7 +1228,6 @@
       </button>
     </div>
 
-    <!-- Professional New Chat Button -->
     <div class="new-chat-btn" onclick="newChat()">
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1237,7 +1237,6 @@
       <span>New Chat</span>
     </div>
 
-    <!-- Search Bar -->
     <div style="margin-top: 8px;">
       <div style="position: relative;">
         <span class="material-symbols-outlined"
@@ -1247,17 +1246,13 @@
       </div>
     </div>
 
-    <!-- Chat History Section -->
     <div class="sidebar-chat-section">
       <div
         style="color: var(--text-muted); font-size: 0.75rem; font-weight: 600; letter-spacing: 1px; padding-left: 4px; margin-bottom: 8px;">
         RECENT CHATS</div>
-      <div class="chat-list-container" id="chatList">
-        <!-- Dynamic chat history tiles go here -->
-      </div>
+      <div class="chat-list-container" id="chatList"></div>
     </div>
 
-    <!-- Bottom Menu -->
     <div class="sidebar-bottom-menu">
       <div class="menu-item" onclick="toggleTheme(event)">
         <span class="material-symbols-outlined" id="themeIcon">light_mode</span>
@@ -1357,7 +1352,6 @@
   <!-- Main Header -->
   <header>
     <div class="header-left">
-      <!-- Flipped Segment Icon -->
       <button class="icon-btn" onclick="toggleSidebar()" aria-label="Open Menu">
         <span class="material-symbols-outlined" style="transform: scaleX(-1);">segment</span>
       </button>
@@ -1365,7 +1359,6 @@
         <div class="logo-text">Looper AI</div>
       </div>
     </div>
-    <!-- New Chat Icon instead of Settings -->
     <button class="icon-btn" onclick="newChat()" aria-label="New Chat">
       <span class="material-symbols-outlined">add_comment</span>
     </button>
@@ -1381,7 +1374,7 @@
     <div class="chat-content" id="chatContent"></div>
   </div>
 
-  <!-- Input Area (REDESIGNED FOR MAX TEXT SPACE) -->
+  <!-- Input Area (PERMANENT DOUBLE STORY LAYOUT) -->
   <div class="input-area">
     <div class="input-wrapper">
       <div class="attachment-preview" id="attachmentPreview">
@@ -1390,10 +1383,11 @@
       </div>
 
       <div class="input-container" id="inputContainer">
-        <!-- Textarea takes 100% width on top -->
+
+        <!-- Top: Textarea -->
         <textarea id="userInput" aria-label="Message input field" rows="1" placeholder="" autocomplete="off"></textarea>
 
-        <!-- Bottom Row for Actions -->
+        <!-- Bottom: Actions -->
         <div class="input-bottom-row">
           <div class="left-actions">
             <input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="handleFileSelect(event)">
@@ -1411,8 +1405,8 @@
             </button>
           </div>
         </div>
-      </div>
 
+      </div>
     </div>
   </div>
 
@@ -1439,7 +1433,6 @@
       setTimeout(() => toast.classList.remove('show'), 2500);
     }
 
-    // Modal & Dropdown click outside fix
     settingsModal.addEventListener('click', function (e) { if (e.target === settingsModal) closeSettings(); });
     document.addEventListener('click', function (e) {
       if (!e.target.closest('.custom-select')) {
@@ -1448,92 +1441,46 @@
     });
 
     // ===== SMART SWIPE FOR MOBILE =====
-    let touchStartX = 0;
-    let touchStartY = 0;
-
-    document.addEventListener('touchstart', e => {
-      touchStartX = e.changedTouches[0].clientX;
-      touchStartY = e.changedTouches[0].clientY;
-    }, { passive: true });
-
+    let touchStartX = 0; let touchStartY = 0;
+    document.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].clientX; touchStartY = e.changedTouches[0].clientY; }, { passive: true });
     document.addEventListener('touchend', e => {
       if (window.innerWidth > 768) return;
-      let touchEndX = e.changedTouches[0].clientX;
-      let touchEndY = e.changedTouches[0].clientY;
-
-      let xDiff = touchEndX - touchStartX;
-      let yDiff = touchEndY - touchStartY;
-
-      // Horizontal swipe check
+      let touchEndX = e.changedTouches[0].clientX; let touchEndY = e.changedTouches[0].clientY;
+      let xDiff = touchEndX - touchStartX; let yDiff = touchEndY - touchStartY;
       if (Math.abs(xDiff) > 50 && Math.abs(xDiff) > Math.abs(yDiff)) {
         const isSidebarOpen = sidebar.classList.contains('open');
-        if (xDiff < 0 && isSidebarOpen) toggleSidebar(); // Swipe Left -> Close
-        if (xDiff > 0 && touchStartX < 80 && !isSidebarOpen) toggleSidebar(); // Swipe Right (from edge) -> Open
+        if (xDiff < 0 && isSidebarOpen) toggleSidebar();
+        if (xDiff > 0 && touchStartX < 80 && !isSidebarOpen) toggleSidebar();
       }
     }, { passive: true });
 
-    // ===== THEME RIPPLE ANIMATION =====
+    // ===== THEME TRANSITION (Direct & Simple) =====
     function toggleTheme(event) {
       if (event) event.preventDefault();
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
       const nextTheme = isDark ? 'light' : 'dark';
-
-      let x = event ? (event.clientX || (event.touches && event.touches[0].clientX) || window.innerWidth / 2) : window.innerWidth / 2;
-      let y = event ? (event.clientY || (event.touches && event.touches[0].clientY) || window.innerHeight / 2) : window.innerHeight / 2;
-
-      const ripple = document.createElement('div');
-      ripple.style.position = 'fixed'; ripple.style.left = x + 'px'; ripple.style.top = y + 'px';
-      ripple.style.width = '0px'; ripple.style.height = '0px'; ripple.style.borderRadius = '50%';
-      ripple.style.backgroundColor = nextTheme === 'dark' ? '#131314' : '#FFFFFF';
-      ripple.style.transform = 'translate(-50%, -50%)'; ripple.style.zIndex = '99999';
-      ripple.style.transition = 'width 0.6s cubic-bezier(0.25, 1, 0.5, 1), height 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
-      document.body.appendChild(ripple);
-
-      const radius = Math.max(Math.hypot(x, y), Math.hypot(window.innerWidth - x, y), Math.hypot(x, window.innerHeight - y), Math.hypot(window.innerWidth - x, window.innerHeight - y));
-
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => { ripple.style.width = (radius * 2.5) + 'px'; ripple.style.height = (radius * 2.5) + 'px'; });
-      });
-
-      setTimeout(() => {
-        document.documentElement.setAttribute('data-theme', nextTheme);
-        document.getElementById('themeIcon').innerText = isDark ? 'dark_mode' : 'light_mode';
-        document.getElementById('themeText').innerText = isDark ? 'Dark Mode' : 'Light Mode';
-        ripple.style.opacity = '0'; ripple.style.transition = 'opacity 0.2s';
-        setTimeout(() => ripple.remove(), 200);
-      }, 600);
+      document.documentElement.setAttribute('data-theme', nextTheme);
+      document.getElementById('themeIcon').innerText = isDark ? 'dark_mode' : 'light_mode';
+      document.getElementById('themeText').innerText = isDark ? 'Dark Mode' : 'Light Mode';
     }
 
     // ===== PHYSICS-BASED SVG SPINNER LOGIC =====
     window.activeSpinners = new WeakMap();
-
     window.startSpinning = function (svg) {
       if (!svg) return;
       if (window.activeSpinners.has(svg)) { window.activeSpinners.get(svg).stopping = false; return; }
-
       let state = { rotation: 0, speed: 0, targetSpeed: 4, stopping: false, active: true };
       window.activeSpinners.set(svg, state);
-
       function animate() {
         if (!state.active) return;
-        if (state.stopping) {
-          state.speed *= 0.92; // Friction
-          if (state.speed < 0.2) { state.active = false; window.activeSpinners.delete(svg); return; }
-        } else {
-          state.speed += (state.targetSpeed - state.speed) * 0.05; // Acceleration
-        }
-        state.rotation += state.speed;
-        svg.style.transform = `rotate(${state.rotation}deg)`;
+        if (state.stopping) { state.speed *= 0.92; if (state.speed < 0.2) { state.active = false; window.activeSpinners.delete(svg); return; } }
+        else { state.speed += (state.targetSpeed - state.speed) * 0.05; }
+        state.rotation += state.speed; svg.style.transform = `rotate(${state.rotation}deg)`;
         requestAnimationFrame(animate);
       }
       requestAnimationFrame(animate);
     };
-
-    window.stopSpinning = function (svg) {
-      if (!svg) return;
-      let state = window.activeSpinners.get(svg);
-      if (state) state.stopping = true;
-    };
+    window.stopSpinning = function (svg) { if (!svg) return; let state = window.activeSpinners.get(svg); if (state) state.stopping = true; };
 
     // ===== MARKDOWN & SYNTAX HIGHLIGHTING =====
     const renderer = new marked.Renderer();
@@ -1592,11 +1539,7 @@
     let isPremiumVoice = localStorage.getItem('looper_voice') === 'true';
     let isSafeMode = localStorage.getItem('looper_safe') === 'true';
     let isCleanSpeech = localStorage.getItem('looper_clean_speech') !== 'false';
-    let chatHistory = [];
-    let isGenerating = false;
-    let attachedImageBase64 = null;
-
-    // Chat History Persistence
+    let chatHistory = []; let isGenerating = false; let attachedImageBase64 = null;
     let allConversations = JSON.parse(localStorage.getItem('looper_all_chats')) || [];
     let activeConversationId = null;
 
@@ -1609,14 +1552,9 @@
     const placeholderPhrases = ["Say hello...", "Imagine a futuristic city...", "Write a python script...", "Analyze this image...", "Explain quantum physics..."];
     let phraseIndex = 0; let charIndex = 0; let isDeletingPlaceholder = false;
     let isInputFocused = false;
-    let typewriterActive = window.innerWidth > 768; // Only active on Desktop
-
-    if (!typewriterActive) {
-      userInput.setAttribute("placeholder", "Say hello...");
-    }
 
     function typeWriterPlaceholder() {
-      if (!typewriterActive) return; // Disable loop entirely on mobile
+      if (window.innerWidth <= 768) { userInput.setAttribute("placeholder", "Say hello..."); return; }
       if (isInputFocused) { setTimeout(typeWriterPlaceholder, 500); return; }
 
       const currentText = placeholderPhrases[phraseIndex];
@@ -1628,24 +1566,15 @@
       else if (isDeletingPlaceholder && charIndex === 0) { isDeletingPlaceholder = false; phraseIndex = (phraseIndex + 1) % placeholderPhrases.length; speed = 400; }
       setTimeout(typeWriterPlaceholder, speed);
     }
-    typeWriterPlaceholder();
 
-    userInput.addEventListener('focus', () => {
-      isInputFocused = true;
-      if (typewriterActive) userInput.setAttribute("placeholder", "");
-    });
+    typeWriterPlaceholder();
+    window.addEventListener('resize', () => { if (window.innerWidth <= 768) userInput.setAttribute("placeholder", "Say hello..."); });
+    userInput.addEventListener('focus', () => { isInputFocused = true; if (window.innerWidth > 768) userInput.setAttribute("placeholder", ""); });
     userInput.addEventListener('blur', () => { isInputFocused = false; });
 
     userInput.addEventListener('input', function () {
       this.style.height = 'auto';
-      let newHeight = this.scrollHeight < 150 ? this.scrollHeight : 150;
-      this.style.height = newHeight + 'px';
-
-      // Dynamic Border Radius (Smart UI fix for spacing)
-      const container = document.getElementById('inputContainer');
-      if (newHeight > 60) { container.style.borderRadius = '16px'; }
-      else { container.style.borderRadius = '24px'; }
-
+      this.style.height = (this.scrollHeight < 200 ? this.scrollHeight : 200) + 'px';
       sendBtn.classList.toggle('active', this.value.trim().length > 0 || attachedImageBase64);
     });
 
@@ -1684,23 +1613,11 @@
     }
 
     function scrollToBottom() { setTimeout(() => { chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' }); }, 50); }
-
-    function escapeHtml(str) {
-      if (!str) return '';
-      return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
-    }
+    function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)); }
 
     // ===== CHAT HISTORY SYSTEM =====
-    function generateTitle(text) {
-      let clean = (text || '').replace(/\s+/g, ' ').trim();
-      return clean.length > 25 ? clean.substring(0, 25) + '...' : (clean || 'New Chat');
-    }
-
-    function saveConversations() {
-      localStorage.setItem('looper_all_chats', JSON.stringify(allConversations));
-      renderRecentChats();
-    }
-
+    function generateTitle(text) { let clean = (text || '').replace(/\s+/g, ' ').trim(); return clean.length > 25 ? clean.substring(0, 25) + '...' : (clean || 'New Chat'); }
+    function saveConversations() { localStorage.setItem('looper_all_chats', JSON.stringify(allConversations)); renderRecentChats(); }
     function updateCurrentConversation() {
       if (!activeConversationId) {
         activeConversationId = 'chat_' + Date.now();
@@ -1710,9 +1627,7 @@
         const conv = allConversations.find(c => c.id === activeConversationId);
         if (conv) {
           conv.history = [...chatHistory];
-          if (conv.title === 'New Chat' && chatHistory.length > 0) {
-            conv.title = generateTitle(chatHistory[0].content);
-          }
+          if (conv.title === 'New Chat' && chatHistory.length > 0) conv.title = generateTitle(chatHistory[0].content);
         }
       }
       saveConversations();
@@ -1726,37 +1641,21 @@
     }
 
     function deleteConversation(id, e) {
-      e.stopPropagation();
-      allConversations = allConversations.filter(c => c.id !== id);
+      e.stopPropagation(); allConversations = allConversations.filter(c => c.id !== id);
       if (activeConversationId === id) newChat(); else saveConversations();
     }
 
-    window.clearAllChats = function () {
-      allConversations = []; localStorage.removeItem('looper_all_chats');
-      newChat(); showToast("All chats cleared!");
-    }
+    window.clearAllChats = function () { allConversations = []; localStorage.removeItem('looper_all_chats'); newChat(); showToast("All chats cleared!"); }
 
     function renderRecentChats() {
-      const list = document.getElementById('chatList');
-      const searchQ = document.getElementById('searchInput').value.toLowerCase();
+      const list = document.getElementById('chatList'); const searchQ = document.getElementById('searchInput').value.toLowerCase();
       list.innerHTML = '';
-
       const filtered = allConversations.filter(c => c.title.toLowerCase().includes(searchQ));
-      if (filtered.length === 0) {
-        list.innerHTML = `<div style="color:var(--text-muted); font-size:0.85rem; padding: 12px; text-align:center;">No chats found</div>`;
-        return;
-      }
-
+      if (filtered.length === 0) { list.innerHTML = `<div style="color:var(--text-muted); font-size:0.85rem; padding: 12px; text-align:center;">No chats found</div>`; return; }
       filtered.forEach(conv => {
-        const div = document.createElement('div');
-        div.className = `chat-tile ${conv.id === activeConversationId ? 'active' : ''}`;
+        const div = document.createElement('div'); div.className = `chat-tile ${conv.id === activeConversationId ? 'active' : ''}`;
         div.onclick = () => loadConversation(conv.id);
-        div.innerHTML = `
-          <div class="chat-tile-title" title="${escapeHtml(conv.title)}">${escapeHtml(conv.title)}</div>
-          <button class="chat-tile-delete" onclick="deleteConversation('${conv.id}', event)">
-            <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
-          </button>
-        `;
+        div.innerHTML = `<div class="chat-tile-title" title="${escapeHtml(conv.title)}">${escapeHtml(conv.title)}</div><button class="chat-tile-delete" onclick="deleteConversation('${conv.id}', event)"><span class="material-symbols-outlined" style="font-size: 16px;">delete</span></button>`;
         list.appendChild(div);
       });
     }
@@ -1764,8 +1663,7 @@
     document.getElementById('searchInput').addEventListener('input', renderRecentChats);
 
     function loadConversation(id) {
-      const conv = allConversations.find(c => c.id === id);
-      if (!conv) return;
+      const conv = allConversations.find(c => c.id === id); if (!conv) return;
       activeConversationId = id; chatHistory = [...conv.history];
       chatContent.innerHTML = ''; hideGreeting();
 
@@ -1775,14 +1673,10 @@
           let contentHtml = `<div class="msg-content">`;
           if (msg.imgBase64) contentHtml += `<img src="${msg.imgBase64}" alt="User Upload">`;
           if (msg.content) contentHtml += escapeHtml(msg.content).replace(/\n/g, '<br>');
-          contentHtml += `</div>`;
-          wrapper.innerHTML = contentHtml; chatContent.appendChild(wrapper);
-        } else {
-          appendAIMessage(msg.content, msg.isImage || false, [], null);
-        }
+          contentHtml += `</div>`; wrapper.innerHTML = contentHtml; chatContent.appendChild(wrapper);
+        } else { appendAIMessage(msg.content, msg.isImage || false, [], null); }
       });
-      scrollToBottom(); renderRecentChats();
-      if (window.innerWidth <= 768) toggleSidebar();
+      scrollToBottom(); renderRecentChats(); if (window.innerWidth <= 768) toggleSidebar();
     }
     renderRecentChats();
 
@@ -1800,8 +1694,7 @@
 
       if (icon.innerText === "stop_circle") {
         if (window.currentAudioPlayer) { window.currentAudioPlayer.pause(); window.currentAudioPlayer = null; }
-        window.speechSynthesis.cancel();
-        icon.innerText = "volume_up"; return;
+        window.speechSynthesis.cancel(); icon.innerText = "volume_up"; return;
       }
       icon.innerText = "stop_circle";
 
@@ -1832,36 +1725,26 @@
 
     function playGoogleTTS(text, icon) {
       const chunks = text.match(/[^.!?\n]+[.!?\n]*/g) || [text];
-      let currentIndex = 0;
-      window.currentAudioPlayer = new Audio();
-
+      let currentIndex = 0; window.currentAudioPlayer = new Audio();
       function playNext() {
         if (icon.innerText !== "stop_circle") return;
         if (currentIndex >= chunks.length) { icon.innerText = "volume_up"; return; }
-
         let chunkText = chunks[currentIndex].trim();
         if (!chunkText) { currentIndex++; playNext(); return; }
-
         const encodedText = encodeURIComponent(chunkText);
         window.currentAudioPlayer.src = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en&q=${encodedText}`;
-
-        window.currentAudioPlayer.play().catch(e => {
-          const remainingText = chunks.slice(currentIndex).join(" ");
-          fallbackTTS(remainingText, icon);
-        });
+        window.currentAudioPlayer.play().catch(e => { const remainingText = chunks.slice(currentIndex).join(" "); fallbackTTS(remainingText, icon); });
       }
       window.currentAudioPlayer.onended = () => { currentIndex++; playNext(); };
       playNext();
     }
 
     function fallbackTTS(text, icon) {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
+      window.speechSynthesis.cancel(); const utterance = new SpeechSynthesisUtterance(text);
       const voices = window.speechSynthesis.getVoices();
       const goodVoice = voices.find(v => v.name.includes("Online (Natural)")) || voices.find(v => v.name.includes("Google US English")) || voices.find(v => v.name.includes("Google UK English Female")) || voices.find(v => v.name.includes("Samantha")) || voices.find(v => v.lang === "en-US");
       if (goodVoice) utterance.voice = goodVoice;
-      utterance.onend = () => icon.innerText = "volume_up";
-      window.speechSynthesis.speak(utterance);
+      utterance.onend = () => icon.innerText = "volume_up"; window.speechSynthesis.speak(utterance);
     }
     window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
 
@@ -1896,27 +1779,15 @@
             } else {
               if (!('webkitSpeechRecognition' in window)) return showToast("Speech recognition not supported in browser.");
               const recognition = new webkitSpeechRecognition(); recognition.lang = 'en-US'; recognition.interimResults = false;
-
-              // Handle Permission errors for Browser Speech
-              recognition.onerror = function (event) {
-                if (event.error === 'not-allowed') {
-                  showToast("Mic access denied by browser.");
-                } else {
-                  showToast("Microphone error.");
-                }
-              };
-
+              recognition.onerror = function (event) { if (event.error === 'not-allowed') { showToast("Mic access denied by browser."); } else { showToast("Microphone error."); } };
               recognition.onresult = (e) => { userInput.value += (userInput.value ? " " : "") + e.results[0][0].transcript; userInput.dispatchEvent(new Event('input')); };
               recognition.start();
             }
           };
           mediaRecorder.start(); isRecording = true; micBtn.classList.add('active-mic');
         } catch (err) {
-          if (err.name === 'NotAllowedError' || err.name === 'SecurityError') {
-            showToast("Mic access denied by browser.");
-          } else {
-            showToast("Microphone error.");
-          }
+          if (err.name === 'NotAllowedError' || err.name === 'SecurityError') { showToast("Mic access denied by browser."); }
+          else { showToast("Microphone access failed."); }
         }
       } else { mediaRecorder.stop(); isRecording = false; }
     }
@@ -1941,7 +1812,6 @@
 
       if (isImage) {
         let fallbackStr = fallbackUrls.length > 0 ? `this.onerror=null; this.src='${fallbackUrls[0]}';` : `this.onerror=null; this.alt='Image generation failed.';`;
-
         aiContent = `
         <div class="generated-image-container">
           <img src="${content}" alt="Generated Art" onerror="${fallbackStr}">
@@ -1976,8 +1846,7 @@
               for (let entry of entries) {
                 if (entry.contentRect.height > 50) {
                   window.stopSpinning(svgEl);
-                  scrollToBottom();
-                  observer.disconnect();
+                  scrollToBottom(); observer.disconnect();
                 }
               }
             });
@@ -2029,10 +1898,25 @@
       return altMatch ? altMatch[1].trim() : null;
     }
 
+    // FIX: Using Stable Fetch URL for Pollinations Text Fallback
     async function fetchFreeResponse(prompt) {
-      const apis = [`https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=${activeModel}`, `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=openai`, `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=mistral`];
-      for (let url of apis) { try { const res = await fetch(url); if (res.ok) return await res.text(); } catch (e) { } }
-      throw new Error("Free Servers are busy.");
+      const apis = [
+        `https://text.pollinations.ai/${encodeURIComponent(prompt)}`,
+        `https://hercai.onrender.com/v3/hercai?question=${encodeURIComponent(prompt)}`
+      ];
+      for (let url of apis) {
+        try {
+          const res = await fetch(url);
+          if (res.ok) {
+            if (url.includes('hercai')) {
+              const data = await res.json();
+              return data.reply;
+            }
+            return await res.text();
+          }
+        } catch (e) { }
+      }
+      throw new Error("Free Servers are busy. Please add an API key in Settings.");
     }
 
     const GROQ_MODELS = ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3.8-27b", "qwen/qwen3.6-27b", "llama-3.3-70b-versatile", "llama-3.1-8b-instant"];
