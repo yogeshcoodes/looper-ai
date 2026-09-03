@@ -54,7 +54,7 @@
       box-shadow: none !important;
     }
 
-    /* Elegant Scrollbars for main container */
+    /* Elegant Scrollbars */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -208,7 +208,7 @@
       transform: scale(0.92);
     }
 
-    /* ===== Sidebar (Pro Architecture) ===== */
+    /* ===== Sidebar ===== */
     .sidebar-overlay {
       position: fixed;
       top: 0;
@@ -254,6 +254,9 @@
 
     .sidebar-header {
       margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       padding-left: 8px;
     }
 
@@ -748,7 +751,7 @@
       visibility: visible;
     }
 
-    /* ===== Input Area ===== */
+    /* ===== NEW: Maximized Input Area ===== */
     .input-area {
       width: 100%;
       display: flex;
@@ -799,13 +802,14 @@
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
+    /* Smart Dynamic Input Container */
     .input-container {
       display: flex;
-      align-items: flex-end;
+      flex-direction: column;
       background: var(--surface);
-      border-radius: 32px;
-      padding: 8px 12px;
-      transition: all 0.3s;
+      border-radius: 24px;
+      padding: 10px 14px;
+      transition: all 0.3s ease;
       border: 1px solid transparent;
     }
 
@@ -813,6 +817,39 @@
       background: var(--surface-hover);
       border: 1px solid var(--border);
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Textarea uses 100% width now */
+    textarea {
+      width: 100%;
+      background: transparent;
+      border: none;
+      padding: 6px 4px 10px 4px;
+      font-size: 1.05rem;
+      color: var(--text-main);
+      resize: none;
+      max-height: 200px;
+      overflow-y: auto;
+      line-height: 1.5;
+    }
+
+    textarea::placeholder {
+      color: var(--text-muted);
+    }
+
+    /* Bottom Actions Row under Textarea */
+    .input-bottom-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
+    .left-actions,
+    .right-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
     }
 
     .action-btn {
@@ -827,7 +864,7 @@
       align-items: center;
       cursor: pointer;
       transition: 0.2s;
-      margin-bottom: 4px;
+      flex-shrink: 0;
     }
 
     .action-btn:hover {
@@ -854,41 +891,29 @@
       }
     }
 
-    textarea {
-      flex: 1;
-      background: transparent;
-      border: none;
-      padding: 12px 8px;
-      font-size: 1.05rem;
-      color: var(--text-main);
-      resize: none;
-      max-height: 150px;
-      overflow-y: auto;
-      line-height: 1.4;
-    }
-
-    textarea::placeholder {
-      color: var(--text-muted);
-    }
-
     .send-btn {
       background: transparent;
       color: var(--text-muted);
       border: none;
-      width: 44px;
-      height: 44px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       display: flex;
       justify-content: center;
       align-items: center;
       cursor: pointer;
-      margin-bottom: 2px;
       transition: 0.2s;
+      flex-shrink: 0;
     }
 
     .send-btn.active {
       color: var(--primary);
-      background: var(--surface);
+      background: var(--primary-light);
+      color: var(--bg-color);
+    }
+
+    [data-theme="dark"] .send-btn.active {
+      color: var(--bg-color);
     }
 
     .send-btn:active {
@@ -977,12 +1002,10 @@
       max-height: 85vh;
       overflow-y: auto;
       scrollbar-width: none;
-      /* Hide scrollbar Firefox */
     }
 
     .modal::-webkit-scrollbar {
       display: none;
-      /* Hide scrollbar Webkit */
     }
 
     .modal-overlay.open .modal {
@@ -1190,9 +1213,18 @@
   <!-- Sidebar & Overlay -->
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
   <div class="sidebar" id="sidebar">
-    <div class="sidebar-header app-logo">
-      <div style="width: 28px; height: 28px;" id="sidebarLogoContainer"></div>
-      <div class="logo-text">Looper AI</div>
+    <div class="sidebar-header">
+      <div class="app-logo">
+        <div style="width: 28px; height: 28px;" id="sidebarLogoContainer"></div>
+        <div class="logo-text">Looper AI</div>
+      </div>
+      <!-- Back Arrow for Sidebar -->
+      <button class="icon-btn" onclick="toggleSidebar()" style="width: 32px; height: 32px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m15 18-6-6 6-6" />
+        </svg>
+      </button>
     </div>
 
     <!-- Professional New Chat Button -->
@@ -1206,7 +1238,7 @@
     </div>
 
     <!-- Search Bar -->
-    <div>
+    <div style="margin-top: 8px;">
       <div style="position: relative;">
         <span class="material-symbols-outlined"
           style="position: absolute; left: 10px; top: 10px; font-size: 18px; color: var(--text-muted);">search</span>
@@ -1227,7 +1259,7 @@
 
     <!-- Bottom Menu -->
     <div class="sidebar-bottom-menu">
-      <div class="menu-item" onclick="toggleTheme()">
+      <div class="menu-item" onclick="toggleTheme(event)">
         <span class="material-symbols-outlined" id="themeIcon">light_mode</span>
         <span id="themeText">Light Mode</span>
       </div>
@@ -1349,31 +1381,38 @@
     <div class="chat-content" id="chatContent"></div>
   </div>
 
-  <!-- Input Area -->
+  <!-- Input Area (REDESIGNED FOR MAX TEXT SPACE) -->
   <div class="input-area">
     <div class="input-wrapper">
       <div class="attachment-preview" id="attachmentPreview">
         <img id="previewImg" src="" alt="preview">
         <button class="close-btn" onclick="clearAttachment()">✕</button>
       </div>
-      <div class="input-container">
-        <!-- Attachment Button -->
-        <input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="handleFileSelect(event)">
-        <button class="action-btn" onclick="document.getElementById('fileInput').click()" title="Attach Image">
-          <span class="material-symbols-outlined">attach_file</span>
-        </button>
 
+      <div class="input-container" id="inputContainer">
+        <!-- Textarea takes 100% width on top -->
         <textarea id="userInput" aria-label="Message input field" rows="1" placeholder="" autocomplete="off"></textarea>
 
-        <!-- Mic Button -->
-        <button class="action-btn" id="micBtn" onclick="toggleMic()" title="Speech to Text">
-          <span class="material-symbols-outlined">mic</span>
-        </button>
+        <!-- Bottom Row for Actions -->
+        <div class="input-bottom-row">
+          <div class="left-actions">
+            <input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="handleFileSelect(event)">
+            <button class="action-btn" onclick="document.getElementById('fileInput').click()" title="Attach Image">
+              <span class="material-symbols-outlined">attach_file</span>
+            </button>
+          </div>
 
-        <button class="send-btn" id="sendBtn" onclick="handleSend()">
-          <span class="material-symbols-outlined">send</span>
-        </button>
+          <div class="right-actions">
+            <button class="action-btn" id="micBtn" onclick="toggleMic()" title="Speech to Text">
+              <span class="material-symbols-outlined">mic</span>
+            </button>
+            <button class="send-btn" id="sendBtn" onclick="handleSend()">
+              <span class="material-symbols-outlined">send</span>
+            </button>
+          </div>
+        </div>
       </div>
+
     </div>
   </div>
 
@@ -1400,6 +1439,7 @@
       setTimeout(() => toast.classList.remove('show'), 2500);
     }
 
+    // Modal & Dropdown click outside fix
     settingsModal.addEventListener('click', function (e) { if (e.target === settingsModal) closeSettings(); });
     document.addEventListener('click', function (e) {
       if (!e.target.closest('.custom-select')) {
@@ -1407,10 +1447,62 @@
       }
     });
 
-    // ===== FIX: Focus to Pause/Clear Placeholder =====
-    let isInputFocused = false;
-    userInput.addEventListener('focus', () => { isInputFocused = true; userInput.setAttribute("placeholder", ""); });
-    userInput.addEventListener('blur', () => { isInputFocused = false; });
+    // ===== SMART SWIPE FOR MOBILE =====
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    document.addEventListener('touchstart', e => {
+      touchStartX = e.changedTouches[0].clientX;
+      touchStartY = e.changedTouches[0].clientY;
+    }, { passive: true });
+
+    document.addEventListener('touchend', e => {
+      if (window.innerWidth > 768) return;
+      let touchEndX = e.changedTouches[0].clientX;
+      let touchEndY = e.changedTouches[0].clientY;
+
+      let xDiff = touchEndX - touchStartX;
+      let yDiff = touchEndY - touchStartY;
+
+      // Horizontal swipe check
+      if (Math.abs(xDiff) > 50 && Math.abs(xDiff) > Math.abs(yDiff)) {
+        const isSidebarOpen = sidebar.classList.contains('open');
+        if (xDiff < 0 && isSidebarOpen) toggleSidebar(); // Swipe Left -> Close
+        if (xDiff > 0 && touchStartX < 80 && !isSidebarOpen) toggleSidebar(); // Swipe Right (from edge) -> Open
+      }
+    }, { passive: true });
+
+    // ===== THEME RIPPLE ANIMATION =====
+    function toggleTheme(event) {
+      if (event) event.preventDefault();
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const nextTheme = isDark ? 'light' : 'dark';
+
+      let x = event ? (event.clientX || (event.touches && event.touches[0].clientX) || window.innerWidth / 2) : window.innerWidth / 2;
+      let y = event ? (event.clientY || (event.touches && event.touches[0].clientY) || window.innerHeight / 2) : window.innerHeight / 2;
+
+      const ripple = document.createElement('div');
+      ripple.style.position = 'fixed'; ripple.style.left = x + 'px'; ripple.style.top = y + 'px';
+      ripple.style.width = '0px'; ripple.style.height = '0px'; ripple.style.borderRadius = '50%';
+      ripple.style.backgroundColor = nextTheme === 'dark' ? '#131314' : '#FFFFFF';
+      ripple.style.transform = 'translate(-50%, -50%)'; ripple.style.zIndex = '99999';
+      ripple.style.transition = 'width 0.6s cubic-bezier(0.25, 1, 0.5, 1), height 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
+      document.body.appendChild(ripple);
+
+      const radius = Math.max(Math.hypot(x, y), Math.hypot(window.innerWidth - x, y), Math.hypot(x, window.innerHeight - y), Math.hypot(window.innerWidth - x, window.innerHeight - y));
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => { ripple.style.width = (radius * 2.5) + 'px'; ripple.style.height = (radius * 2.5) + 'px'; });
+      });
+
+      setTimeout(() => {
+        document.documentElement.setAttribute('data-theme', nextTheme);
+        document.getElementById('themeIcon').innerText = isDark ? 'dark_mode' : 'light_mode';
+        document.getElementById('themeText').innerText = isDark ? 'Dark Mode' : 'Light Mode';
+        ripple.style.opacity = '0'; ripple.style.transition = 'opacity 0.2s';
+        setTimeout(() => ripple.remove(), 200);
+      }, 600);
+    }
 
     // ===== PHYSICS-BASED SVG SPINNER LOGIC =====
     window.activeSpinners = new WeakMap();
@@ -1516,9 +1608,17 @@
 
     const placeholderPhrases = ["Say hello...", "Imagine a futuristic city...", "Write a python script...", "Analyze this image...", "Explain quantum physics..."];
     let phraseIndex = 0; let charIndex = 0; let isDeletingPlaceholder = false;
+    let isInputFocused = false;
+    let typewriterActive = window.innerWidth > 768; // Only active on Desktop
+
+    if (!typewriterActive) {
+      userInput.setAttribute("placeholder", "Say hello...");
+    }
 
     function typeWriterPlaceholder() {
+      if (!typewriterActive) return; // Disable loop entirely on mobile
       if (isInputFocused) { setTimeout(typeWriterPlaceholder, 500); return; }
+
       const currentText = placeholderPhrases[phraseIndex];
       if (isDeletingPlaceholder) { userInput.setAttribute("placeholder", currentText.substring(0, charIndex - 1)); charIndex--; }
       else { userInput.setAttribute("placeholder", currentText.substring(0, charIndex + 1)); charIndex++; }
@@ -1530,19 +1630,28 @@
     }
     typeWriterPlaceholder();
 
+    userInput.addEventListener('focus', () => {
+      isInputFocused = true;
+      if (typewriterActive) userInput.setAttribute("placeholder", "");
+    });
+    userInput.addEventListener('blur', () => { isInputFocused = false; });
+
     userInput.addEventListener('input', function () {
-      this.style.height = 'auto'; this.style.height = (this.scrollHeight < 150 ? this.scrollHeight : 150) + 'px';
+      this.style.height = 'auto';
+      let newHeight = this.scrollHeight < 150 ? this.scrollHeight : 150;
+      this.style.height = newHeight + 'px';
+
+      // Dynamic Border Radius (Smart UI fix for spacing)
+      const container = document.getElementById('inputContainer');
+      if (newHeight > 60) { container.style.borderRadius = '16px'; }
+      else { container.style.borderRadius = '24px'; }
+
       sendBtn.classList.toggle('active', this.value.trim().length > 0 || attachedImageBase64);
     });
+
     userInput.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } });
 
     function toggleSidebar() { sidebar.classList.toggle('open'); overlay.classList.toggle('open'); }
-    function toggleTheme() {
-      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-      document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
-      document.getElementById('themeIcon').innerText = isDark ? 'dark_mode' : 'light_mode';
-      document.getElementById('themeText').innerText = isDark ? 'Dark Mode' : 'Light Mode';
-    }
 
     let activeModel = localStorage.getItem('looper_default_model') || 'openai';
     const selectedModelText = document.getElementById('selectedModelText');
@@ -1787,12 +1896,28 @@
             } else {
               if (!('webkitSpeechRecognition' in window)) return showToast("Speech recognition not supported in browser.");
               const recognition = new webkitSpeechRecognition(); recognition.lang = 'en-US'; recognition.interimResults = false;
+
+              // Handle Permission errors for Browser Speech
+              recognition.onerror = function (event) {
+                if (event.error === 'not-allowed') {
+                  showToast("Mic access denied by browser.");
+                } else {
+                  showToast("Microphone error.");
+                }
+              };
+
               recognition.onresult = (e) => { userInput.value += (userInput.value ? " " : "") + e.results[0][0].transcript; userInput.dispatchEvent(new Event('input')); };
               recognition.start();
             }
           };
           mediaRecorder.start(); isRecording = true; micBtn.classList.add('active-mic');
-        } catch (err) { showToast("Microphone access denied."); }
+        } catch (err) {
+          if (err.name === 'NotAllowedError' || err.name === 'SecurityError') {
+            showToast("Mic access denied by browser.");
+          } else {
+            showToast("Microphone error.");
+          }
+        }
       } else { mediaRecorder.stop(); isRecording = false; }
     }
 
