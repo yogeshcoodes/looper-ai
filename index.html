@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Looper AI - Ultimate Pro</title>
+  <title>Looper AI</title>
 
   <!-- Favicon generated from SVG Logo -->
   <link rel="icon" type="image/svg+xml"
@@ -76,6 +76,11 @@
     ::selection {
       background: var(--primary-light);
       color: var(--text-inverse);
+    }
+
+    /* ===== THEME TRANSITION FIX (Prevents Flashing) ===== */
+    .theme-switching * {
+      transition: none !important;
     }
 
     /* ===== CSS Variables ===== */
@@ -751,7 +756,7 @@
       visibility: visible;
     }
 
-    /* ===== NEW: Permanent Double-Story Input Area ===== */
+    /* ===== Input Area (PERMANENT DOUBLE STORY LAYOUT) ===== */
     .input-area {
       width: 100%;
       display: flex;
@@ -1220,6 +1225,7 @@
         <div style="width: 28px; height: 28px;" id="sidebarLogoContainer"></div>
         <div class="logo-text">Looper AI</div>
       </div>
+      <!-- Back Arrow for Sidebar -->
       <button class="icon-btn" onclick="toggleSidebar()" style="width: 32px; height: 32px;">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
           stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1273,7 +1279,7 @@
   <div class="modal-overlay" id="settingsModal">
     <div class="modal">
       <div class="modal-header"><span class="material-symbols-outlined">tune</span>
-        <h3>Ultimate Settings</h3>
+        <h3>Settings</h3>
       </div>
 
       <div class="modal-group">
@@ -1454,14 +1460,46 @@
       }
     }, { passive: true });
 
-    // ===== THEME TRANSITION (Direct & Simple) =====
+    // ===== THEME TRANSITION FIX (Flawless Overlay) =====
     function toggleTheme(event) {
       if (event) event.preventDefault();
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
       const nextTheme = isDark ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', nextTheme);
-      document.getElementById('themeIcon').innerText = isDark ? 'dark_mode' : 'light_mode';
-      document.getElementById('themeText').innerText = isDark ? 'Dark Mode' : 'Light Mode';
+
+      let x = window.innerWidth / 2; let y = window.innerHeight / 2;
+      if (event && event.clientX) { x = event.clientX; y = event.clientY; }
+      else if (event && event.touches && event.touches[0]) { x = event.touches[0].clientX; y = event.touches[0].clientY; }
+
+      const ripple = document.createElement('div');
+      ripple.style.position = 'fixed'; ripple.style.left = x + 'px'; ripple.style.top = y + 'px';
+      ripple.style.width = '0px'; ripple.style.height = '0px'; ripple.style.borderRadius = '50%';
+      ripple.style.backgroundColor = nextTheme === 'dark' ? '#131314' : '#FFFFFF';
+      ripple.style.transform = 'translate(-50%, -50%)'; ripple.style.zIndex = '99999';
+      ripple.style.transition = 'width 0.6s cubic-bezier(0.25, 1, 0.5, 1), height 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
+      document.body.appendChild(ripple);
+
+      const radius = Math.max(Math.hypot(x, y), Math.hypot(window.innerWidth - x, y), Math.hypot(x, window.innerHeight - y), Math.hypot(window.innerWidth - x, window.innerHeight - y));
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          ripple.style.width = (radius * 2.5) + 'px'; ripple.style.height = (radius * 2.5) + 'px';
+        });
+      });
+
+      setTimeout(() => {
+        document.body.classList.add('theme-switching'); // Disable all transitions temporarily
+        document.documentElement.setAttribute('data-theme', nextTheme);
+        document.getElementById('themeIcon').innerText = isDark ? 'dark_mode' : 'light_mode';
+        document.getElementById('themeText').innerText = isDark ? 'Dark Mode' : 'Light Mode';
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            document.body.classList.remove('theme-switching'); // Re-enable transitions
+            ripple.style.opacity = '0'; ripple.style.transition = 'opacity 0.3s ease-in-out';
+            setTimeout(() => ripple.remove(), 300);
+          });
+        });
+      }, 600);
     }
 
     // ===== PHYSICS-BASED SVG SPINNER LOGIC =====
@@ -1553,6 +1591,7 @@
     let phraseIndex = 0; let charIndex = 0; let isDeletingPlaceholder = false;
     let isInputFocused = false;
 
+    // Disabled Typewriter for mobile screens natively
     function typeWriterPlaceholder() {
       if (window.innerWidth <= 768) { userInput.setAttribute("placeholder", "Say hello..."); return; }
       if (isInputFocused) { setTimeout(typeWriterPlaceholder, 500); return; }
@@ -1613,10 +1652,17 @@
     }
 
     function scrollToBottom() { setTimeout(() => { chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' }); }, 50); }
-    function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)); }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+    }
 
     // ===== CHAT HISTORY SYSTEM =====
-    function generateTitle(text) { let clean = (text || '').replace(/\s+/g, ' ').trim(); return clean.length > 25 ? clean.substring(0, 25) + '...' : (clean || 'New Chat'); }
+    function generateTitle(text) {
+      let clean = (text || '').replace(/\s+/g, ' ').trim();
+      return clean.length > 25 ? clean.substring(0, 25) + '...' : (clean || 'New Chat');
+    }
     function saveConversations() { localStorage.setItem('looper_all_chats', JSON.stringify(allConversations)); renderRecentChats(); }
     function updateCurrentConversation() {
       if (!activeConversationId) {
@@ -1652,6 +1698,7 @@
       list.innerHTML = '';
       const filtered = allConversations.filter(c => c.title.toLowerCase().includes(searchQ));
       if (filtered.length === 0) { list.innerHTML = `<div style="color:var(--text-muted); font-size:0.85rem; padding: 12px; text-align:center;">No chats found</div>`; return; }
+
       filtered.forEach(conv => {
         const div = document.createElement('div'); div.className = `chat-tile ${conv.id === activeConversationId ? 'active' : ''}`;
         div.onclick = () => loadConversation(conv.id);
@@ -1685,7 +1732,7 @@
       navigator.clipboard.writeText(text).then(() => { const icon = btn.querySelector('span'); icon.innerText = "check"; showToast("Message copied!"); setTimeout(() => icon.innerText = "content_copy", 2000); });
     }
 
-    // ===== AUDIO: ULTIMATE TTS =====
+    // ===== AUDIO TTS =====
     window.currentAudioPlayer = null;
 
     async function readAloud(btn) {
@@ -1812,6 +1859,7 @@
 
       if (isImage) {
         let fallbackStr = fallbackUrls.length > 0 ? `this.onerror=null; this.src='${fallbackUrls[0]}';` : `this.onerror=null; this.alt='Image generation failed.';`;
+
         aiContent = `
         <div class="generated-image-container">
           <img src="${content}" alt="Generated Art" onerror="${fallbackStr}">
@@ -1898,24 +1946,26 @@
       return altMatch ? altMatch[1].trim() : null;
     }
 
-    // FIX: Using Stable Fetch URL for Pollinations Text Fallback
+    // UPDATED POST METHOD FOR FREE FALLBACK TO AVOID URL BREAKS/ERRORS
     async function fetchFreeResponse(prompt) {
-      const apis = [
-        `https://text.pollinations.ai/${encodeURIComponent(prompt)}`,
-        `https://hercai.onrender.com/v3/hercai?question=${encodeURIComponent(prompt)}`
-      ];
-      for (let url of apis) {
-        try {
-          const res = await fetch(url);
-          if (res.ok) {
-            if (url.includes('hercai')) {
-              const data = await res.json();
-              return data.reply;
-            }
-            return await res.text();
-          }
-        } catch (e) { }
-      }
+      try {
+        const res = await fetch("https://text.pollinations.ai/", {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: [{ role: 'user', content: prompt }],
+            model: activeModel === 'llama' ? 'llama' : (activeModel === 'mistral' ? 'mistral' : 'openai')
+          })
+        });
+        if (res.ok) return await res.text();
+      } catch (e) { }
+
+      // Backup Hercai
+      try {
+        const res2 = await fetch(`https://hercai.onrender.com/v3/hercai?question=${encodeURIComponent(prompt)}`);
+        if (res2.ok) return (await res2.json()).reply;
+      } catch (e) { }
+
       throw new Error("Free Servers are busy. Please add an API key in Settings.");
     }
 
@@ -1924,7 +1974,7 @@
     async function callGroqAPI(key, hasImage, base64) {
       let sysMsg = customInstructions; if (isSafeMode) sysMsg += " (Ensure responses are highly safe and moderated.)";
       let fullMessages = sysMsg ? [{ role: "system", content: sysMsg }] : [];
-      const cleanHistory = chatHistory.filter(m => m.content && m.content.trim() !== '').slice(-15);
+      const cleanHistory = chatHistory.filter(m => m.content && m.content.trim() !== '').slice(-15).map(m => ({ role: m.role, content: m.content }));
 
       if (hasImage) {
         let visionMessages = [...fullMessages, ...cleanHistory]; let lastMsg = visionMessages.pop();
@@ -1970,7 +2020,7 @@
 
     async function callOpenAIAPI(key, hasImage, base64) {
       let sysMsg = customInstructions; let fullMessages = sysMsg ? [{ role: "system", content: sysMsg }] : [];
-      const cleanHistory = chatHistory.filter(m => m.content && m.content.trim() !== '').slice(-15);
+      const cleanHistory = chatHistory.filter(m => m.content && m.content.trim() !== '').slice(-15).map(m => ({ role: m.role, content: m.content }));
       let targetModel = "gpt-4o-mini";
       if (hasImage) {
         targetModel = "gpt-4o"; let visionMessages = [...fullMessages, ...cleanHistory]; let lastMsg = visionMessages.pop();
