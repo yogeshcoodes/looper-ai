@@ -69,7 +69,7 @@
       background: var(--text-muted);
     }
 
-    ::selection {
+    ::-webkit-selection {
       background: var(--primary-light);
       color: var(--text-inverse);
     }
@@ -178,6 +178,26 @@
       padding: 12px 20px;
       background: transparent;
       z-index: 10;
+    }
+
+    @media (max-width: 768px) {
+      header {
+        padding: 6px 16px;
+      }
+
+      .icon-btn {
+        width: 38px;
+        height: 38px;
+      }
+
+      .app-logo svg {
+        width: 24px;
+        height: 24px;
+      }
+
+      .logo-text {
+        font-size: 1.15rem;
+      }
     }
 
     .header-left {
@@ -349,22 +369,6 @@
       transform: scale(0.98);
     }
 
-    .menu-item {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 12px 16px;
-      border-radius: 20px;
-      cursor: pointer;
-      color: var(--text-main);
-      transition: background 0.2s;
-      font-size: 0.95rem;
-    }
-
-    .menu-item:hover {
-      background: var(--surface);
-    }
-
     .sidebar-chat-section {
       flex: 1;
       display: flex;
@@ -377,6 +381,9 @@
       flex: 1;
       overflow-y: auto;
       padding-right: 4px;
+      padding-bottom: 20px;
+      -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+      mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
     }
 
     .chat-tile {
@@ -428,10 +435,109 @@
       background: rgba(211, 47, 47, 0.1);
     }
 
+    /* 💡 PERFECTLY SMOOTH SIDEBAR BOTTOM MENU LOGIC */
     .sidebar-bottom-menu {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
       margin-top: auto;
       padding-top: 12px;
       border-top: 1px solid var(--border);
+      height: 188px;
+      /* 4 items * 44px + 12px padding */
+      overflow: hidden;
+      transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .sidebar.scrolled .sidebar-bottom-menu {
+      height: 56px;
+      /* 1 item row 44px + 12px padding */
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding-left: 16px;
+      /* Default left padding */
+      border-radius: 20px;
+      cursor: pointer;
+      color: var(--text-main);
+      font-size: 0.95rem;
+      width: 100%;
+      height: 44px;
+      box-sizing: border-box;
+      overflow: hidden;
+      /* Removed "all" to prevent slow opacity fade during sidebar toggle */
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease;
+    }
+
+    .sidebar.scrolled .menu-item {
+      width: 25%;
+      /* Shrink to fit 4 in a row */
+      padding-left: 19px;
+      /* Perfectly centers the icon */
+    }
+
+    .menu-item:hover {
+      background: var(--surface);
+    }
+
+    .menu-item .material-symbols-outlined {
+      flex-shrink: 0;
+      /* Guarantees the icon NEVER disappears or gets squished */
+    }
+
+    .menu-text {
+      white-space: nowrap;
+      opacity: 1;
+      /* 💡 When opening (scroll up): Wait for box to expand (0.15s) then smoothly fade in */
+      transition: opacity 0.2s ease 0.15s;
+    }
+
+    .sidebar.scrolled .menu-text {
+      opacity: 0;
+      /* 💡 When closing (scroll down): Instantly disappear (0.05s) so it doesn't get clipped visually */
+      transition: opacity 0.05s ease 0s;
+    }
+
+    @keyframes menuSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Instantly hide when sidebar closes via hamburger icon */
+    .sidebar:not(.open) .menu-item {
+      opacity: 0;
+      transition: none;
+    }
+
+    .sidebar.open .menu-item {
+      opacity: 0;
+      animation: menuSlideIn 0.4s ease forwards;
+    }
+
+    .sidebar.open .menu-item:nth-child(1) {
+      animation-delay: 0.1s;
+    }
+
+    .sidebar.open .menu-item:nth-child(2) {
+      animation-delay: 0.15s;
+    }
+
+    .sidebar.open .menu-item:nth-child(3) {
+      animation-delay: 0.2s;
+    }
+
+    .sidebar.open .menu-item:nth-child(4) {
+      animation-delay: 0.25s;
     }
 
     /* ===== Chat Area ===== */
@@ -489,7 +595,7 @@
       padding: 24px 20px;
       display: flex;
       flex-direction: column;
-      gap: 32px;
+      gap: 20px;
     }
 
     @keyframes fadeInUp {
@@ -526,11 +632,10 @@
     .message-wrapper.user .msg-content {
       background: var(--user-bubble);
       padding: 14px 20px;
-      border-radius: 24px 24px 4px 24px;
+      border-radius: 24px;
       font-size: 1.05rem;
       line-height: 1.5;
       max-width: 95%;
-      /* Wider Bubble */
       width: fit-content;
       word-wrap: break-word;
       white-space: pre-wrap;
@@ -572,7 +677,7 @@
       background: var(--surface);
     }
 
-    /* 💡 STICKY EDITING BEHAVIOR */
+    /* STICKY EDITING BEHAVIOR */
     .message-wrapper.user.editing-active {
       position: sticky;
       top: 10px;
@@ -580,12 +685,11 @@
       z-index: 50;
     }
 
-    /* 💡 ZERO-BACKGROUND INLINE EDIT CONTAINER (Clean & Minimal) */
+    /* ZERO-BACKGROUND INLINE EDIT CONTAINER */
     .inline-edit-container {
       width: 100%;
       min-width: 250px;
       max-width: 650px;
-      /* Gives good space for editing */
       display: flex;
       flex-direction: column;
       align-items: flex-end;
@@ -595,10 +699,8 @@
     .inline-edit-textarea {
       width: 100%;
       background: transparent;
-      /* No ugly background */
       color: var(--text-main);
       border: 1px solid var(--border);
-      /* Clean generic border */
       border-radius: 16px;
       padding: 12px 16px;
       font-size: 1.05rem;
@@ -945,12 +1047,11 @@
       display: flex;
       justify-content: center;
       padding: 12px 20px;
-      padding-bottom: calc(24px + env(safe-area-inset-bottom));
+      padding-bottom: calc(12px + env(safe-area-inset-bottom));
       background: transparent;
       transition: opacity 0.3s ease, filter 0.3s ease;
     }
 
-    /* 💡 GREY OUT DURING EDIT */
     .input-area.disabled {
       opacity: 0.3;
       pointer-events: none;
@@ -1164,11 +1265,12 @@
       font-weight: 500;
       letter-spacing: 0.3px;
       color: var(--text-muted);
-      margin-top: 10px;
+      margin-top: 4px;
+      /* Reduced gap under input */
       transition: color 0.3s;
     }
 
-    /* ===== Settings Modal (Fixed Header & Cross) ===== */
+    /* ===== Modals ===== */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -1412,8 +1514,7 @@
 
 <body>
 
-  <!-- Google Login Overlay -->
-  <div class="login-overlay" id="loginOverlay">
+  <div class="login-overlay hidden" id="loginOverlay">
     <div class="login-card">
       <div style="width: 56px; height: 56px; margin: 0 auto 16px auto;" id="loginLogoContainer"></div>
       <h2>Welcome to Looper AI</h2>
@@ -1494,24 +1595,24 @@
     <div class="sidebar-bottom-menu">
       <div class="menu-item" onclick="toggleTheme(event)">
         <span class="material-symbols-outlined" id="themeIcon">light_mode</span>
-        <span id="themeText">Light Mode</span>
+        <span id="themeText" class="menu-text">Light Mode</span>
       </div>
       <div class="menu-item" onclick="openSettings()">
         <span class="material-symbols-outlined">settings</span>
-        <span>Settings</span>
+        <span class="menu-text">Settings</span>
       </div>
       <div class="menu-item" style="color: #d32f2f;" onclick="clearAllChats()">
         <span class="material-symbols-outlined">delete_sweep</span>
-        <span>Clear All Chats</span>
+        <span class="menu-text">Clear All Chats</span>
       </div>
-      <div class="menu-item" style="color: #d32f2f;" onclick="logoutUser()">
+      <div class="menu-item" style="color: #d32f2f;" onclick="openSignoutModal()">
         <span class="material-symbols-outlined">logout</span>
-        <span>Sign Out</span>
+        <span class="menu-text">Sign Out</span>
       </div>
     </div>
   </div>
 
-  <!-- Settings Modal (Fixed Header & Cross) -->
+  <!-- Settings Modal -->
   <div class="modal-overlay" id="settingsModal">
     <div class="modal">
       <div class="modal-header">
@@ -1598,6 +1699,24 @@
     </div>
   </div>
 
+  <!-- 💡 Premium Sign Out Modal (Custom UI) -->
+  <div class="modal-overlay" id="signoutModal">
+    <div class="modal" style="padding: 24px; text-align: center; max-width: 320px;">
+      <div style="display: flex; justify-content: center; margin-bottom: 16px; color: #d32f2f;">
+        <span class="material-symbols-outlined" style="font-size: 48px;">logout</span>
+      </div>
+      <h3 style="margin-bottom: 8px; font-size: 1.4rem; font-weight: 600; color: var(--text-main);">Sign Out</h3>
+      <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 0.95rem;">Are you sure you want to sign out of
+        your account?</p>
+      <div style="display: flex; gap: 12px; width: 100%;">
+        <button class="modal-btn" onclick="closeSignoutModal()"
+          style="flex: 1; background: var(--surface); color: var(--text-main); margin-top: 0;">Cancel</button>
+        <button class="modal-btn" onclick="confirmSignout()"
+          style="flex: 1; background: #d32f2f; color: white; margin-top: 0;">Sign Out</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Main Header -->
   <header>
     <div class="header-left">
@@ -1623,7 +1742,7 @@
     <div class="chat-content" id="chatContent"></div>
   </div>
 
-  <!-- Input Area (PERMANENT DOUBLE STORY LAYOUT) -->
+  <!-- Input Area -->
   <div class="input-area">
     <div class="input-wrapper">
       <div class="attachment-preview" id="attachmentPreview">
@@ -1632,7 +1751,6 @@
       </div>
 
       <div class="input-container" id="inputContainer">
-
         <!-- Top: Textarea -->
         <textarea id="userInput" aria-label="Message input field" rows="1" placeholder="" autocomplete="off"></textarea>
 
@@ -1690,12 +1808,14 @@
       }
     };
 
-    window.logoutUser = async function () {
+    // Custom Modal Signout logic
+    window.confirmSignout = async function () {
       try {
-        window.stopAllAudio(); // Stop audio on logout
+        window.stopAllAudio();
         await signOut(auth);
+        closeSignoutModal();
         showToast("Signed out.");
-      } catch (e) { }
+      } catch (e) { console.error("Logout Error:", e); }
     };
 
     onAuthStateChanged(auth, (user) => {
@@ -1721,7 +1841,18 @@
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
     const settingsModal = document.getElementById('settingsModal');
+    const signoutModal = document.getElementById('signoutModal');
     const heroLogo = document.getElementById('heroLogoContainer');
+
+    // Scroll Listener for Bottom Menu Animation
+    const chatListContainer = document.getElementById('chatList');
+    chatListContainer.addEventListener('scroll', () => {
+      if (chatListContainer.scrollTop > 5) {
+        sidebar.classList.add('scrolled');
+      } else {
+        sidebar.classList.remove('scrolled');
+      }
+    });
 
     let heroRotation = 0;
     heroLogo.addEventListener('click', () => { heroRotation += 360; heroLogo.style.transform = `rotate(${heroRotation}deg)`; });
@@ -1732,15 +1863,15 @@
       setTimeout(() => toast.classList.remove('show'), 2500);
     }
 
-    // Modal click outside to close
     settingsModal.addEventListener('click', function (e) { if (e.target === settingsModal) closeSettings(); });
+    signoutModal.addEventListener('click', function (e) { if (e.target === signoutModal) closeSignoutModal(); });
+
     document.addEventListener('click', function (e) {
       if (!e.target.closest('.custom-select')) {
         document.querySelectorAll('.select-items').forEach(el => el.classList.remove('show'));
       }
     });
 
-    // ===== SMART SWIPE FOR MOBILE =====
     let touchStartX = 0; let touchStartY = 0;
     document.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].clientX; touchStartY = e.changedTouches[0].clientY; }, { passive: true });
     document.addEventListener('touchend', e => {
@@ -1754,7 +1885,6 @@
       }
     }, { passive: true });
 
-    // ===== THEME TRANSITION FIX =====
     function toggleTheme(event) {
       if (event) event.preventDefault();
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -1796,7 +1926,6 @@
       }, 600);
     }
 
-    // ===== PHYSICS-BASED SVG SPINNER LOGIC =====
     window.activeSpinners = new WeakMap();
     window.startSpinning = function (svg) {
       if (!svg) return;
@@ -1814,7 +1943,6 @@
     };
     window.stopSpinning = function (svg) { if (!svg) return; let state = window.activeSpinners.get(svg); if (state) state.stopping = true; };
 
-    // ===== MARKDOWN & SYNTAX HIGHLIGHTING =====
     const renderer = new marked.Renderer();
     renderer.code = function (code, language) {
       const validLang = hljs.getLanguage(language) ? language : 'plaintext';
@@ -1846,14 +1974,15 @@
       }
       const runBtn = e.target.closest('.run-btn');
       if (runBtn) {
-        const pre = runBtn.closest('.code-wrapper').querySelector('pre');
-        const newWindow = window.open();
-        newWindow.document.open(); newWindow.document.write(pre.innerText); newWindow.document.close();
-        showToast("Code running in new tab!");
+        if (confirm("Warning: Running untrusted AI-generated code can be risky. Do you want to continue?")) {
+          const pre = runBtn.closest('.code-wrapper').querySelector('pre');
+          const newWindow = window.open();
+          newWindow.document.open(); newWindow.document.write(pre.innerText); newWindow.document.close();
+          showToast("Code running in new tab!");
+        }
       }
     });
 
-    // ===== AUDIO TTS SYSTEM & STOP FUNCTION =====
     window.currentAudioPlayer = null;
 
     window.stopAllAudio = function () {
@@ -1877,11 +2006,10 @@
         a.download = `LooperAI_Image_${Math.floor(Math.random() * 10000)}.jpg`;
         document.body.appendChild(a); a.click(); document.body.removeChild(a);
         showToast("Download started!");
-      } catch (e) { window.open(url, '_blank'); }
+      } catch (e) { console.error(e); window.open(url, '_blank'); }
     };
     window.shareImage = function (url) { navigator.clipboard.writeText(url); showToast("Image URL copied!"); };
 
-    // ===== Advanced State & Memory =====
     let apiKey = localStorage.getItem('looper_api_key') || '';
     let customInstructions = localStorage.getItem('looper_instructions') || '';
     let reasoningEffort = localStorage.getItem('looper_reasoning') || 'none';
@@ -1898,7 +2026,6 @@
     document.getElementById('safeModeToggle').checked = isSafeMode;
     document.getElementById('cleanSpeechToggle').checked = isCleanSpeech;
 
-    // DYNAMIC NETWORK STATUS UPDATER
     function updateNetworkStatus() {
       const isPersonal = apiKey && apiKey.length > 10;
       const mainStatus = document.getElementById('mainNetworkStatus');
@@ -1962,6 +2089,10 @@
     window.openSettings = function () { settingsModal.classList.add('open'); if (sidebar.classList.contains('open')) toggleSidebar(); }
     window.closeSettings = function () { settingsModal.classList.remove('open'); document.querySelectorAll('.select-items').forEach(el => el.classList.remove('show')); }
 
+    // Custom Signout Handlers
+    window.openSignoutModal = function () { signoutModal.classList.add('open'); if (sidebar.classList.contains('open')) toggleSidebar(); }
+    window.closeSignoutModal = function () { signoutModal.classList.remove('open'); }
+
     function saveSettings() {
       apiKey = document.getElementById('apiKeyInput').value.trim();
       customInstructions = document.getElementById('customInstructionsInput').value.trim();
@@ -1989,7 +2120,6 @@
       return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
     }
 
-    // ===== CHAT HISTORY SYSTEM =====
     function generateTitle(text) {
       let clean = (text || '').replace(/\s+/g, ' ').trim();
       return clean.length > 25 ? clean.substring(0, 25) + '...' : (clean || 'New Chat');
@@ -2064,7 +2194,6 @@
     }
     renderRecentChats();
 
-    // ===== 💡 PRO GEMINI STYLE USER MESSAGE ACTIONS =====
     window.copyUserMsg = function (btn) {
       const wrapper = btn.closest('.message-wrapper.user');
       const textNode = wrapper.querySelector('.msg-content textarea') || wrapper.querySelector('.msg-content');
@@ -2096,17 +2225,14 @@
       let textContent = msgToEdit.content;
       if (textContent === "[Uploaded an Image]") textContent = "";
 
-      // 💡 Grey out the main input bar
       const inputArea = document.querySelector('.input-area');
       inputArea.classList.add('disabled');
 
-      // 💡 Make wrapper sticky so it follows the user if they scroll
       wrapper.classList.add('editing-active');
 
       const msgCol = wrapper.querySelector('.user-msg-col');
       const originalContentHtml = msgCol.innerHTML;
 
-      // 💡 ULTRA CLEAN GEMINI-STYLE INLINE EDITOR (Transparent background, just a border)
       msgCol.innerHTML = `
         <div class="inline-edit-container">
           <textarea class="inline-edit-textarea" rows="1">${escapeHtml(textContent)}</textarea>
@@ -2121,7 +2247,6 @@
       textarea.focus();
       textarea.setSelectionRange(textarea.value.length, textarea.value.length);
 
-      // Auto-resize textarea perfectly to fit text
       const adjustHeight = () => {
         textarea.style.height = 'auto';
         textarea.style.height = textarea.scrollHeight + 'px';
@@ -2129,14 +2254,12 @@
       textarea.addEventListener('input', adjustHeight);
       setTimeout(adjustHeight, 0);
 
-      // CANCEL 
       msgCol.querySelector('.cancel').onclick = () => {
         msgCol.innerHTML = originalContentHtml;
         inputArea.classList.remove('disabled');
         wrapper.classList.remove('editing-active');
       };
 
-      // UPDATE & SUBMIT
       msgCol.querySelector('.save').onclick = async () => {
         const newText = textarea.value.trim();
         if (!newText && !msgToEdit.imgBase64) return;
@@ -2144,12 +2267,11 @@
         inputArea.classList.remove('disabled');
         wrapper.classList.remove('editing-active');
 
-        // Remove all subsequent messages from DOM and History
         chatHistory = chatHistory.slice(0, index);
         while (wrapper.nextElementSibling) {
           wrapper.nextElementSibling.remove();
         }
-        wrapper.remove(); // Remove original bubble completely
+        wrapper.remove();
 
         if (chatHistory.length === 0) {
           greetingScreen.style.display = 'flex';
@@ -2157,7 +2279,6 @@
         }
         updateCurrentConversation();
 
-        // Feed to system for new response
         attachedImageBase64 = msgToEdit.imgBase64 || null;
         userInput.value = newText;
         await handleSend();
@@ -2169,7 +2290,6 @@
       navigator.clipboard.writeText(text).then(() => { const icon = btn.querySelector('span'); icon.innerText = "check"; showToast("Message copied!"); setTimeout(() => icon.innerText = "content_copy", 2000); });
     }
 
-    // ===== AUDIO TTS =====
     async function readAloud(btn) {
       const rawText = btn.closest('.message-wrapper').querySelector('.ai-text').innerText;
       const icon = btn.querySelector('span');
@@ -2202,7 +2322,7 @@
           window.currentAudioPlayer.onended = () => icon.innerText = "volume_up";
           window.currentAudioPlayer.play();
           return;
-        } catch (e) { }
+        } catch (e) { console.error(e); }
       }
       playGoogleTTS(textToSpeak, icon);
     }
@@ -2217,7 +2337,7 @@
         if (!chunkText) { currentIndex++; playNext(); return; }
         const encodedText = encodeURIComponent(chunkText);
         window.currentAudioPlayer.src = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en&q=${encodedText}`;
-        window.currentAudioPlayer.play().catch(e => { const remainingText = chunks.slice(currentIndex).join(" "); fallbackTTS(remainingText, icon); });
+        window.currentAudioPlayer.play().catch(e => { console.error(e); const remainingText = chunks.slice(currentIndex).join(" "); fallbackTTS(remainingText, icon); });
       }
       window.currentAudioPlayer.onended = () => { currentIndex++; playNext(); };
       playNext();
@@ -2232,7 +2352,6 @@
     }
     window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
 
-    // ===== VISION & MIC =====
     function handleFileSelect(e) {
       const file = e.target.files[0]; if (!file) return;
       const reader = new FileReader();
@@ -2259,7 +2378,7 @@
               try {
                 const res = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", { method: "POST", headers: { "Authorization": `Bearer ${apiKey}` }, body: formData });
                 const data = await res.json(); userInput.value += (userInput.value ? " " : "") + data.text; userInput.dispatchEvent(new Event('input'));
-              } catch (e) { showToast("Transcription Failed"); }
+              } catch (e) { console.error(e); showToast("Transcription Failed"); }
             } else {
               if (!('webkitSpeechRecognition' in window)) return showToast("Speech recognition not supported in browser.");
               const recognition = new webkitSpeechRecognition(); recognition.lang = 'en-US'; recognition.interimResults = false;
@@ -2276,7 +2395,6 @@
       } else { mediaRecorder.stop(); isRecording = false; }
     }
 
-    // ===== Render User & AI Msgs =====
     function hideGreeting() { if (greetingScreen.style.display !== 'none') { greetingScreen.style.opacity = '0'; setTimeout(() => greetingScreen.style.display = 'none', 300); } }
 
     function appendUserMessage(text, imgBase64 = null, historyIndex) {
@@ -2290,7 +2408,6 @@
       if (text) contentHtml += escapeHtml(text).replace(/\n/g, '<br>');
       contentHtml += `</div>`;
 
-      // Custom Edit & Copy Actions
       contentHtml += `<div class="user-msg-actions">
           <button class="icon-btn" onclick="editUserMsg(this)" title="Edit"><span class="material-symbols-outlined" style="font-size: 18px;">edit</span></button>
           <button class="icon-btn" onclick="copyUserMsg(this)" title="Copy"><span class="material-symbols-outlined" style="font-size: 18px;">content_copy</span></button>
@@ -2385,7 +2502,6 @@
 
     function removeLoading() { isGenerating = false; const loader = document.getElementById('loadingIndicator'); if (loader) loader.remove(); }
 
-    // ===== SMART INTENT AND API ROUTING =====
     function extractImagePrompt(text) {
       if (/(?:code|html|css|js|javascript|python|c\+\+|java|script|program|website|app)/i.test(text) && !/(?:image|picture|photo|logo)\s+(?:of|for)/i.test(text)) { return null; }
       const regex = /^(?:can you\s+|please\s+|could you\s+)?(?:imagine|dr[oa]w|p[ai]nt|sket[c]?h|generate\s+an?\s+image|create\s+an?\s+image|make\s+an?\s+image|show\s+me\s+an?\s+image|pic(?:ture)?\s+of|photo(?:graph)?\s+of|image\s+of)(?:\s+of)?\s+(.+)/i;
@@ -2394,7 +2510,6 @@
       return altMatch ? altMatch[1].trim() : null;
     }
 
-    // CLOUDFLARE PROXY INTEGRATION
     async function callCloudflareProxy(hasImage, base64) {
       if (hasImage) throw new Error("Image analysis requires a custom API key in Settings.");
       let sysMsg = customInstructions;
@@ -2416,7 +2531,6 @@
       return data.choices[0].message.content;
     }
 
-    // PRO FEATURES BEHIND API KEY
     const GROQ_MODELS = ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3.8-27b", "qwen/qwen3.6-27b", "llama-3.3-70b-versatile", "llama-3.1-8b-instant"];
     async function callGroqAPI(key, hasImage, base64) {
       let sysMsg = customInstructions; if (isSafeMode) sysMsg += " (Ensure responses are highly safe and moderated.)";
@@ -2434,7 +2548,7 @@
               body: JSON.stringify({ model: vModel, messages: visionMessages, temperature: 0.6 })
             });
             if (res.ok) return (await res.json()).choices[0].message.content;
-          } catch (e) { }
+          } catch (e) { console.error(e); }
         }
         throw new Error("Vision models unavailable.");
       }
@@ -2500,7 +2614,6 @@
       else return await callGroqAPI(key, hasImage, base64);
     }
 
-    // HANDLE SEND
     async function handleSend() {
       if (isGenerating) return;
       let text = userInput.value.trim(); let hasImage = attachedImageBase64 !== null;
