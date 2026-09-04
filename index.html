@@ -442,7 +442,8 @@
       align-content: flex-start;
       margin-top: auto;
       padding-top: 12px;
-      border-top: 1px solid var(--border);
+      border-top: none;
+      /* REMOVED BORDER AS REQUESTED */
       height: 188px;
       /* 4 items * 44px + 12px padding */
       overflow: hidden;
@@ -787,6 +788,7 @@
       height: 20px;
     }
 
+    /* Fixed AI Text constraints */
     .ai-text {
       font-size: 1.05rem;
       line-height: 1.6;
@@ -795,7 +797,51 @@
       margin-top: 4px;
       flex: 1;
       width: 100%;
-      overflow: hidden;
+      overflow-x: auto;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .ai-text::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Smooth AI text typing effect */
+    @keyframes smoothTextFade {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .ai-text>* {
+      animation: smoothTextFade 0.4s ease-out forwards;
+      opacity: 0;
+    }
+
+    .ai-text>*:nth-child(1) {
+      animation-delay: 0.1s;
+    }
+
+    .ai-text>*:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .ai-text>*:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
+    .ai-text>*:nth-child(4) {
+      animation-delay: 0.4s;
+    }
+
+    .ai-text>*:nth-child(n+5) {
+      animation-delay: 0.5s;
     }
 
     .msg-actions {
@@ -855,21 +901,38 @@
       margin-bottom: 6px;
     }
 
+    /* Completely fixed table container CSS for compactness and no scrollbars */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+      margin-bottom: 14px;
+      border-radius: 8px;
+    }
+
+    .table-container::-webkit-scrollbar {
+      display: none;
+    }
+
     .ai-text table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 14px;
+      font-size: 0.92rem;
+      min-width: 450px;
+      /* Prevents text from being overly squished */
     }
 
     .ai-text th,
     .ai-text td {
       border: 1px solid var(--border);
-      padding: 10px;
+      padding: 8px 12px;
       text-align: left;
     }
 
     .ai-text th {
       background: var(--surface-hover);
+      font-weight: 600;
     }
 
     .inline-code {
@@ -1122,11 +1185,17 @@
       padding: 0 4px 10px 4px;
       font-size: 1.05rem;
       color: var(--text-main);
+      caret-color: var(--primary);
+      /* Smooth customized colored cursor */
       resize: none;
       max-height: 200px;
       overflow-y: auto;
       line-height: 1.5;
       outline: none;
+      scroll-behavior: smooth;
+      /* Smooth scrolling equivalent for textareas */
+      transition: height 0.15s ease-out;
+      /* Smooth expansion animation */
     }
 
     textarea::placeholder {
@@ -1580,7 +1649,7 @@
       <div style="position: relative;">
         <span class="material-symbols-outlined"
           style="position: absolute; left: 10px; top: 10px; font-size: 18px; color: var(--text-muted);">search</span>
-        <input type="text" id="searchInput" placeholder="Search chats..."
+        <input type="text" id="searchInput" name="chat_search" placeholder="Search chats..."
           style="width: 100%; padding: 10px 14px 10px 36px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); color: var(--text-main); outline: none; font-size: 0.9rem; transition: 0.2s;">
       </div>
     </div>
@@ -1641,7 +1710,8 @@
 
         <div class="modal-group">
           <div class="setting-label">API Key (Optional for Vision & Premium Voice)</div>
-          <input type="password" id="apiKeyInput" class="setting-input" placeholder="Leave blank for free chat...">
+          <input type="password" id="apiKeyInput" name="api_key_input" class="setting-input" autocomplete="off"
+            placeholder="Leave blank for free chat...">
           <div id="settingsApiStatus"
             style="font-size: 0.8rem; font-weight: 500; color: var(--primary); margin-top: 8px;">Currently using
             Looper Secure Proxy</div>
@@ -1649,7 +1719,7 @@
 
         <div class="modal-group">
           <div class="setting-label">Custom Instructions (System)</div>
-          <textarea id="customInstructionsInput" class="setting-input" rows="2"
+          <textarea id="customInstructionsInput" name="custom_instructions" class="setting-input" rows="2"
             placeholder="You are an expert..."></textarea>
         </div>
 
@@ -1675,7 +1745,8 @@
             <div class="setting-label" style="margin:0;">Premium Voice (Groq Orpheus)</div><span
               style="font-size:0.75rem; color:var(--text-muted);">Requires Personal API Key</span>
           </div>
-          <label class="switch"><input type="checkbox" id="premiumVoiceToggle"><span class="slider"></span></label>
+          <label class="switch"><input type="checkbox" id="premiumVoiceToggle" name="premium_voice_toggle"><span
+              class="slider"></span></label>
         </div>
 
         <div class="toggle-row">
@@ -1683,7 +1754,8 @@
             <div class="setting-label" style="margin:0;">Read Only Text</div><span
               style="font-size:0.75rem; color:var(--text-muted);">Ignores symbols and emojis</span>
           </div>
-          <label class="switch"><input type="checkbox" id="cleanSpeechToggle"><span class="slider"></span></label>
+          <label class="switch"><input type="checkbox" id="cleanSpeechToggle" name="clean_speech_toggle"><span
+              class="slider"></span></label>
         </div>
 
         <div class="toggle-row">
@@ -1691,7 +1763,8 @@
             <div class="setting-label" style="margin:0;">Safe Mode</div><span
               style="font-size:0.75rem; color:var(--text-muted);">Enable Moderation</span>
           </div>
-          <label class="switch"><input type="checkbox" id="safeModeToggle"><span class="slider"></span></label>
+          <label class="switch"><input type="checkbox" id="safeModeToggle" name="safe_mode_toggle"><span
+              class="slider"></span></label>
         </div>
 
         <button class="modal-btn" onclick="saveSettings()">Save & Apply</button>
@@ -1752,12 +1825,14 @@
 
       <div class="input-container" id="inputContainer">
         <!-- Top: Textarea -->
-        <textarea id="userInput" aria-label="Message input field" rows="1" placeholder="" autocomplete="off"></textarea>
+        <textarea id="userInput" name="main_chat_input" aria-label="Message input field" rows="1" placeholder=""
+          autocomplete="off"></textarea>
 
         <!-- Bottom: Actions -->
         <div class="input-bottom-row">
           <div class="left-actions">
-            <input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="handleFileSelect(event)">
+            <input type="file" id="fileInput" name="file_upload_input" accept="image/*" style="display:none;"
+              onchange="handleFileSelect(event)">
             <button class="action-btn" onclick="document.getElementById('fileInput').click()" title="Attach Image">
               <span class="material-symbols-outlined">attach_file</span>
             </button>
@@ -1944,6 +2019,18 @@
     window.stopSpinning = function (svg) { if (!svg) return; let state = window.activeSpinners.get(svg); if (state) state.stopping = true; };
 
     const renderer = new marked.Renderer();
+
+    // Custom Table Renderer to ensure perfect horizontal scrolling without cutting off
+    renderer.table = function (header, body) {
+      return `
+      <div class="table-container">
+        <table>
+          <thead>${header}</thead>
+          <tbody>${body}</tbody>
+        </table>
+      </div>`;
+    };
+
     renderer.code = function (code, language) {
       const validLang = hljs.getLanguage(language) ? language : 'plaintext';
       const highlighted = hljs.highlight(code, { language: validLang }).value;
@@ -2048,22 +2135,60 @@
     let isInputFocused = false;
 
     function typeWriterPlaceholder() {
-      if (window.innerWidth <= 768) { userInput.setAttribute("placeholder", "Say hello..."); return; }
-      if (isInputFocused) { setTimeout(typeWriterPlaceholder, 500); return; }
+      // ONLY run Typewriter if we are on the home/new chat screen
+      if (chatHistory.length > 0) {
+        userInput.setAttribute("placeholder", "Message Looper AI...");
+        setTimeout(typeWriterPlaceholder, 500);
+        return;
+      }
+
+      // Stop typing effect completely while input is focused (PC & Mobile)
+      if (isInputFocused) {
+        setTimeout(typeWriterPlaceholder, 500);
+        return;
+      }
 
       const currentText = placeholderPhrases[phraseIndex];
-      if (isDeletingPlaceholder) { userInput.setAttribute("placeholder", currentText.substring(0, charIndex - 1)); charIndex--; }
-      else { userInput.setAttribute("placeholder", currentText.substring(0, charIndex + 1)); charIndex++; }
+      if (isDeletingPlaceholder) {
+        charIndex--;
+      } else {
+        charIndex++;
+      }
 
+      let textToShow = currentText.substring(0, charIndex);
       let speed = isDeletingPlaceholder ? 40 : 80;
-      if (!isDeletingPlaceholder && charIndex === currentText.length) { speed = 2000; isDeletingPlaceholder = true; }
-      else if (isDeletingPlaceholder && charIndex === 0) { isDeletingPlaceholder = false; phraseIndex = (phraseIndex + 1) % placeholderPhrases.length; speed = 400; }
+
+      if (!isDeletingPlaceholder && charIndex === currentText.length) {
+        speed = 2000;
+        isDeletingPlaceholder = true;
+      } else if (isDeletingPlaceholder && charIndex === 0) {
+        isDeletingPlaceholder = false;
+        phraseIndex = (phraseIndex + 1) % placeholderPhrases.length;
+        speed = 400;
+      }
+
+      userInput.setAttribute("placeholder", textToShow);
       setTimeout(typeWriterPlaceholder, speed);
     }
 
     typeWriterPlaceholder();
-    window.addEventListener('resize', () => { if (window.innerWidth <= 768) userInput.setAttribute("placeholder", "Say hello..."); });
-    userInput.addEventListener('focus', () => { isInputFocused = true; if (window.innerWidth > 768) userInput.setAttribute("placeholder", ""); });
+
+    window.addEventListener('resize', () => {
+      if (chatHistory.length > 0) userInput.setAttribute("placeholder", "Message Looper AI...");
+    });
+
+    userInput.addEventListener('focus', () => {
+      isInputFocused = true;
+      userInput.setAttribute("placeholder", ""); // Clear immediately on focus
+
+      // Instantly fade out Home Greeting when user taps the input (especially on mobile)
+      if (window.innerWidth <= 768) {
+        if (chatHistory.length === 0) {
+          hideGreeting();
+        }
+      }
+    });
+
     userInput.addEventListener('blur', () => { isInputFocused = false; });
 
     userInput.addEventListener('input', function () {
@@ -2235,7 +2360,7 @@
 
       msgCol.innerHTML = `
         <div class="inline-edit-container">
-          <textarea class="inline-edit-textarea" rows="1">${escapeHtml(textContent)}</textarea>
+          <textarea class="inline-edit-textarea" name="inline_edit" id="inlineEditBox" rows="1">${escapeHtml(textContent)}</textarea>
           <div class="inline-edit-actions">
             <button class="inline-btn cancel">Cancel</button>
             <button class="inline-btn save">Update</button>
@@ -2273,10 +2398,6 @@
         }
         wrapper.remove();
 
-        if (chatHistory.length === 0) {
-          greetingScreen.style.display = 'flex';
-          setTimeout(() => greetingScreen.style.opacity = '1', 50);
-        }
         updateCurrentConversation();
 
         attachedImageBase64 = msgToEdit.imgBase64 || null;
@@ -2324,31 +2445,57 @@
           return;
         } catch (e) { console.error(e); }
       }
-      playGoogleTTS(textToSpeak, icon);
+      playNativeTTS(textToSpeak, icon);
     }
 
-    function playGoogleTTS(text, icon) {
-      const chunks = text.match(/[^.!?\n]+[.!?\n]*/g) || [text];
-      let currentIndex = 0; window.currentAudioPlayer = new Audio();
-      function playNext() {
-        if (icon.innerText !== "stop_circle") return;
-        if (currentIndex >= chunks.length) { icon.innerText = "volume_up"; return; }
-        let chunkText = chunks[currentIndex].trim();
-        if (!chunkText) { currentIndex++; playNext(); return; }
-        const encodedText = encodeURIComponent(chunkText);
-        window.currentAudioPlayer.src = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en&q=${encodedText}`;
-        window.currentAudioPlayer.play().catch(e => { console.error(e); const remainingText = chunks.slice(currentIndex).join(" "); fallbackTTS(remainingText, icon); });
-      }
-      window.currentAudioPlayer.onended = () => { currentIndex++; playNext(); };
-      playNext();
-    }
+    // 💡 Completely refactored to fully native browser TTS to prevent CORB network errors
+    function playNativeTTS(text, icon) {
+      window.speechSynthesis.cancel();
 
-    function fallbackTTS(text, icon) {
-      window.speechSynthesis.cancel(); const utterance = new SpeechSynthesisUtterance(text);
       const voices = window.speechSynthesis.getVoices();
-      const goodVoice = voices.find(v => v.name.includes("Online (Natural)")) || voices.find(v => v.name.includes("Google US English")) || voices.find(v => v.name.includes("Google UK English Female")) || voices.find(v => v.name.includes("Samantha")) || voices.find(v => v.lang === "en-US");
-      if (goodVoice) utterance.voice = goodVoice;
-      utterance.onend = () => icon.innerText = "volume_up"; window.speechSynthesis.speak(utterance);
+      const goodVoice = voices.find(v => v.name.includes("Online (Natural)")) ||
+        voices.find(v => v.name.includes("Google US English")) ||
+        voices.find(v => v.name.includes("Google UK English Female")) ||
+        voices.find(v => v.name.includes("Samantha")) ||
+        voices.find(v => v.lang === "en-US");
+
+      // Basic chunking to prevent Chrome from stopping randomly on long texts
+      const chunks = text.match(/[^.!?\n]+[.!?\n]*/g) || [text];
+      let currentIndex = 0;
+
+      function speakNextChunk() {
+        if (icon.innerText !== "stop_circle") {
+          window.speechSynthesis.cancel();
+          return;
+        }
+        if (currentIndex >= chunks.length) {
+          icon.innerText = "volume_up";
+          return;
+        }
+        const chunkText = chunks[currentIndex].trim();
+        if (!chunkText) {
+          currentIndex++;
+          speakNextChunk();
+          return;
+        }
+
+        const utterance = new SpeechSynthesisUtterance(chunkText);
+        if (goodVoice) utterance.voice = goodVoice;
+
+        utterance.onend = () => {
+          currentIndex++;
+          speakNextChunk();
+        };
+
+        utterance.onerror = (e) => {
+          console.error("Native TTS Error:", e);
+          icon.innerText = "volume_up";
+        };
+
+        window.speechSynthesis.speak(utterance);
+      }
+
+      speakNextChunk();
     }
     window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
 
