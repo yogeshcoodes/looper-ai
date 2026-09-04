@@ -395,13 +395,17 @@
       cursor: pointer;
       color: var(--text-main);
       margin-bottom: 6px;
-      transition: background 0.2s;
+      transition: background 0.2s ease, transform 0.1s ease, border-color 0.2s ease;
       font-size: 0.95rem;
       border: 1px solid transparent;
     }
 
     .chat-tile:hover {
       background: var(--surface);
+    }
+
+    .chat-tile:active {
+      transform: scale(0.98);
     }
 
     .chat-tile.active {
@@ -443,7 +447,6 @@
       margin-top: auto;
       padding-top: 12px;
       border-top: none;
-      /* REMOVED BORDER AS REQUESTED */
       height: 188px;
       /* 4 items * 44px + 12px padding */
       overflow: hidden;
@@ -460,7 +463,6 @@
       align-items: center;
       gap: 14px;
       padding-left: 16px;
-      /* Default left padding */
       border-radius: 20px;
       cursor: pointer;
       color: var(--text-main);
@@ -469,7 +471,6 @@
       height: 44px;
       box-sizing: border-box;
       overflow: hidden;
-      /* Removed "all" to prevent slow opacity fade during sidebar toggle */
       transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease;
     }
 
@@ -486,59 +487,19 @@
 
     .menu-item .material-symbols-outlined {
       flex-shrink: 0;
-      /* Guarantees the icon NEVER disappears or gets squished */
     }
 
     .menu-text {
       white-space: nowrap;
       opacity: 1;
-      /* 💡 When opening (scroll up): Wait for box to expand (0.15s) then smoothly fade in */
+      /* When opening (scroll up): Wait for box to expand (0.15s) then smoothly fade in */
       transition: opacity 0.2s ease 0.15s;
     }
 
     .sidebar.scrolled .menu-text {
       opacity: 0;
-      /* 💡 When closing (scroll down): Instantly disappear (0.05s) so it doesn't get clipped visually */
+      /* When closing (scroll down): Instantly disappear (0.05s) so it doesn't get clipped visually */
       transition: opacity 0.05s ease 0s;
-    }
-
-    @keyframes menuSlideIn {
-      from {
-        opacity: 0;
-        transform: translateY(15px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* Instantly hide when sidebar closes via hamburger icon */
-    .sidebar:not(.open) .menu-item {
-      opacity: 0;
-      transition: none;
-    }
-
-    .sidebar.open .menu-item {
-      opacity: 0;
-      animation: menuSlideIn 0.4s ease forwards;
-    }
-
-    .sidebar.open .menu-item:nth-child(1) {
-      animation-delay: 0.1s;
-    }
-
-    .sidebar.open .menu-item:nth-child(2) {
-      animation-delay: 0.15s;
-    }
-
-    .sidebar.open .menu-item:nth-child(3) {
-      animation-delay: 0.2s;
-    }
-
-    .sidebar.open .menu-item:nth-child(4) {
-      animation-delay: 0.25s;
     }
 
     /* ===== Chat Area ===== */
@@ -1127,6 +1088,18 @@
       position: relative;
     }
 
+    @keyframes fadeInScale {
+      from {
+        opacity: 0;
+        transform: scale(0.95) translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
     .attachment-preview {
       display: none;
       padding: 8px;
@@ -1136,6 +1109,7 @@
       border: 1px solid var(--border);
       width: fit-content;
       position: relative;
+      animation: fadeInScale 0.3s ease forwards;
     }
 
     .attachment-preview img {
@@ -1160,6 +1134,12 @@
       font-weight: bold;
       border: none;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .attachment-preview .close-btn:hover {
+      transform: scale(1.15);
+      background-color: #ff4d4d;
     }
 
     .input-container {
@@ -1168,8 +1148,9 @@
       background: var(--surface);
       border-radius: 16px;
       padding: 12px 14px;
-      transition: border 0.3s ease, box-shadow 0.3s ease;
+      transition: border 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
       border: 1px solid transparent;
+      cursor: text;
     }
 
     .input-container:focus-within {
@@ -1186,16 +1167,14 @@
       font-size: 1.05rem;
       color: var(--text-main);
       caret-color: var(--primary);
-      /* Smooth customized colored cursor */
       resize: none;
       max-height: 200px;
       overflow-y: auto;
       line-height: 1.5;
       outline: none;
       scroll-behavior: smooth;
-      /* Smooth scrolling equivalent for textareas */
       transition: height 0.15s ease-out;
-      /* Smooth expansion animation */
+      cursor: text;
     }
 
     textarea::placeholder {
@@ -1207,6 +1186,7 @@
       justify-content: space-between;
       align-items: center;
       width: 100%;
+      cursor: default;
     }
 
     .left-actions {
@@ -1335,7 +1315,6 @@
       letter-spacing: 0.3px;
       color: var(--text-muted);
       margin-top: 4px;
-      /* Reduced gap under input */
       transition: color 0.3s;
     }
 
@@ -1578,6 +1557,69 @@
       background: var(--surface-hover);
       color: var(--primary);
     }
+
+    /* ===== LIGHTBOX / FULLSCREEN IMAGE VIEWER ===== */
+    .image-viewer-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 1000000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease;
+      overflow: hidden;
+    }
+
+    .image-viewer-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .image-viewer-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.15);
+      border: none;
+      color: white;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background 0.2s;
+      backdrop-filter: blur(4px);
+    }
+
+    .image-viewer-close:hover {
+      background: rgba(255, 255, 255, 0.35);
+    }
+
+    .image-viewer-img {
+      max-width: 95vw;
+      max-height: 95vh;
+      object-fit: contain;
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+      /* Prevents browser handling gestures */
+      transition: transform 0.1s cubic-bezier(0.2, 0, 0.2, 1);
+    }
+
+    .image-viewer-img:active {
+      cursor: grabbing;
+      transition: none;
+      /* Instant feedback on active drag/zoom */
+    }
   </style>
 </head>
 
@@ -1619,6 +1661,14 @@
 
   <!-- Toast Notification -->
   <div id="toastMessage" class="toast">Action completed!</div>
+
+  <!-- FULLSCREEN IMAGE VIEWER OVERLAY -->
+  <div class="image-viewer-overlay" id="imageViewerOverlay">
+    <button class="image-viewer-close" onclick="closeImageViewer()">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+    <img class="image-viewer-img" id="imageViewerImg" src="" alt="Full Screen Image">
+  </div>
 
   <!-- Sidebar & Overlay -->
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
@@ -1772,7 +1822,7 @@
     </div>
   </div>
 
-  <!-- 💡 Premium Sign Out Modal (Custom UI) -->
+  <!-- Premium Sign Out Modal (Custom UI) -->
   <div class="modal-overlay" id="signoutModal">
     <div class="modal" style="padding: 24px; text-align: center; max-width: 320px;">
       <div style="display: flex; justify-content: center; margin-bottom: 16px; color: #d32f2f;">
@@ -1883,7 +1933,6 @@
       }
     };
 
-    // Custom Modal Signout logic
     window.confirmSignout = async function () {
       try {
         window.stopAllAudio();
@@ -2049,7 +2098,107 @@
     renderer.codespan = function (text) { return `<code class="inline-code">${text}</code>`; };
     marked.setOptions({ renderer: renderer, breaks: true });
 
+    // ===== LIGHTBOX/IMAGE VIEWER LOGIC =====
+    const imageViewerOverlay = document.getElementById('imageViewerOverlay');
+    const imageViewerImg = document.getElementById('imageViewerImg');
+    let viewerScale = 1;
+    let viewerTranslateX = 0;
+    let viewerTranslateY = 0;
+    let viewerIsDragging = false;
+    let viewerStartX, viewerStartY;
+    let viewerInitialDistance = null;
+
+    window.closeImageViewer = function () {
+      imageViewerOverlay.classList.remove('active');
+    };
+
+    imageViewerOverlay.addEventListener('click', (e) => {
+      if (e.target === imageViewerOverlay) closeImageViewer();
+    });
+
+    function updateImageViewerTransform() {
+      imageViewerImg.style.transform = `translate(${viewerTranslateX}px, ${viewerTranslateY}px) scale(${viewerScale})`;
+    }
+
+    // Mouse Wheel Zoom for PC
+    imageViewerOverlay.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const zoomSpeed = 0.1;
+      const zoomAmount = viewerScale * zoomSpeed;
+      if (e.deltaY < 0) {
+        viewerScale += zoomAmount;
+      } else {
+        viewerScale = Math.max(0.5, viewerScale - zoomAmount);
+      }
+      viewerScale = Math.min(viewerScale, 10); // Max zoom x10
+      updateImageViewerTransform();
+    }, { passive: false });
+
+    // Pinch-to-Zoom and Drag for Mobile
+    imageViewerOverlay.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 2) {
+        viewerInitialDistance = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+      } else if (e.touches.length === 1) {
+        viewerIsDragging = true;
+        viewerStartX = e.touches[0].clientX - viewerTranslateX;
+        viewerStartY = e.touches[0].clientY - viewerTranslateY;
+      }
+    }, { passive: false });
+
+    imageViewerOverlay.addEventListener('touchmove', (e) => {
+      e.preventDefault(); // crucial to prevent the actual webpage from zooming
+      if (e.touches.length === 2 && viewerInitialDistance) {
+        const currentDistance = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        const ratio = currentDistance / viewerInitialDistance;
+        viewerScale = Math.max(0.5, Math.min(viewerScale * ratio, 10));
+        viewerInitialDistance = currentDistance;
+        updateImageViewerTransform();
+      } else if (e.touches.length === 1 && viewerIsDragging) {
+        viewerTranslateX = e.touches[0].clientX - viewerStartX;
+        viewerTranslateY = e.touches[0].clientY - viewerStartY;
+        updateImageViewerTransform();
+      }
+    }, { passive: false });
+
+    imageViewerOverlay.addEventListener('touchend', (e) => {
+      if (e.touches.length < 2) viewerInitialDistance = null;
+      if (e.touches.length === 0) viewerIsDragging = false;
+    });
+
+    // Mouse Drag for panning on PC
+    imageViewerImg.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      viewerIsDragging = true;
+      viewerStartX = e.clientX - viewerTranslateX;
+      viewerStartY = e.clientY - viewerTranslateY;
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!viewerIsDragging) return;
+      viewerTranslateX = e.clientX - viewerStartX;
+      viewerTranslateY = e.clientY - viewerStartY;
+      updateImageViewerTransform();
+    });
+    window.addEventListener('mouseup', () => { viewerIsDragging = false; });
+    // ========================================
+
     chatContainer.addEventListener('click', (e) => {
+      // Intercept image clicks for Lightbox (Ignoring the AI SVG logo)
+      if (e.target.tagName === 'IMG' && !e.target.closest('.ai-avatar')) {
+        imageViewerImg.src = e.target.src;
+        imageViewerOverlay.classList.add('active');
+        viewerScale = 1;
+        viewerTranslateX = 0;
+        viewerTranslateY = 0;
+        updateImageViewerTransform();
+        return;
+      }
+
       const copyBtn = e.target.closest('.copy-btn');
       if (copyBtn) {
         const pre = copyBtn.closest('.code-wrapper').querySelector('pre');
@@ -2133,18 +2282,11 @@
     const placeholderPhrases = ["Say hello...", "Imagine a futuristic city...", "Write a python script...", "Analyze this image...", "Explain quantum physics..."];
     let phraseIndex = 0; let charIndex = 0; let isDeletingPlaceholder = false;
     let isInputFocused = false;
+    let typeWriterActive = true;
+    let typeWriterTimeout;
 
     function typeWriterPlaceholder() {
-      // ONLY run Typewriter if we are on the home/new chat screen
-      if (chatHistory.length > 0) {
-        userInput.setAttribute("placeholder", "Message Looper AI...");
-        setTimeout(typeWriterPlaceholder, 500);
-        return;
-      }
-
-      // Stop typing effect completely while input is focused (PC & Mobile)
-      if (isInputFocused) {
-        setTimeout(typeWriterPlaceholder, 500);
+      if (!typeWriterActive || chatHistory.length > 0) {
         return;
       }
 
@@ -2168,28 +2310,40 @@
       }
 
       userInput.setAttribute("placeholder", textToShow);
-      setTimeout(typeWriterPlaceholder, speed);
+      typeWriterTimeout = setTimeout(typeWriterPlaceholder, speed);
     }
 
     typeWriterPlaceholder();
 
     window.addEventListener('resize', () => {
-      if (chatHistory.length > 0) userInput.setAttribute("placeholder", "Message Looper AI...");
+      if ((chatHistory.length > 0 || !typeWriterActive) && !isInputFocused) {
+        userInput.setAttribute("placeholder", "Message Looper AI...");
+      }
     });
 
     userInput.addEventListener('focus', () => {
       isInputFocused = true;
-      userInput.setAttribute("placeholder", ""); // Clear immediately on focus
+      typeWriterActive = false;
+      clearTimeout(typeWriterTimeout);
 
-      // Instantly fade out Home Greeting when user taps the input (especially on mobile)
-      if (window.innerWidth <= 768) {
-        if (chatHistory.length === 0) {
-          hideGreeting();
-        }
+      userInput.setAttribute("placeholder", "");
+
+      if (chatHistory.length === 0) {
+        hideGreeting();
       }
     });
 
-    userInput.addEventListener('blur', () => { isInputFocused = false; });
+    userInput.addEventListener('blur', () => {
+      isInputFocused = false;
+      userInput.setAttribute("placeholder", "Message Looper AI...");
+    });
+
+    // FOCUS TEXTAREA WHEN CLICKING ANYWHERE IN THE INPUT CONTAINER
+    document.getElementById('inputContainer').addEventListener('click', function (e) {
+      if (!e.target.closest('button') && e.target.tagName !== 'INPUT') {
+        userInput.focus();
+      }
+    });
 
     userInput.addEventListener('input', function () {
       this.style.height = 'auto';
@@ -2214,7 +2368,6 @@
     window.openSettings = function () { settingsModal.classList.add('open'); if (sidebar.classList.contains('open')) toggleSidebar(); }
     window.closeSettings = function () { settingsModal.classList.remove('open'); document.querySelectorAll('.select-items').forEach(el => el.classList.remove('show')); }
 
-    // Custom Signout Handlers
     window.openSignoutModal = function () { signoutModal.classList.add('open'); if (sidebar.classList.contains('open')) toggleSidebar(); }
     window.closeSignoutModal = function () { signoutModal.classList.remove('open'); }
 
@@ -2234,7 +2387,6 @@
       localStorage.setItem('looper_default_model', activeModel);
 
       updateNetworkStatus();
-
       closeSettings(); showToast("Settings saved successfully!");
     }
 
@@ -2271,6 +2423,17 @@
       greetingScreen.style.display = 'flex'; setTimeout(() => greetingScreen.style.opacity = '1', 50);
       if (window.innerWidth <= 768 && sidebar.classList.contains('open')) toggleSidebar();
       renderRecentChats();
+
+      typeWriterActive = true;
+      isDeletingPlaceholder = false;
+      charIndex = 0;
+      phraseIndex = 0;
+      clearTimeout(typeWriterTimeout);
+      if (!isInputFocused) {
+        typeWriterPlaceholder();
+      } else {
+        userInput.setAttribute("placeholder", "");
+      }
     }
 
     function deleteConversation(id, e) {
@@ -2307,6 +2470,10 @@
       const conv = allConversations.find(c => c.id === id); if (!conv) return;
       activeConversationId = id; chatHistory = [...conv.history];
       chatContent.innerHTML = ''; hideGreeting();
+
+      typeWriterActive = false;
+      clearTimeout(typeWriterTimeout);
+      if (!isInputFocused) userInput.setAttribute("placeholder", "Message Looper AI...");
 
       chatHistory.forEach((msg, index) => {
         if (msg.role === 'user') {
@@ -2448,7 +2615,6 @@
       playNativeTTS(textToSpeak, icon);
     }
 
-    // 💡 Completely refactored to fully native browser TTS to prevent CORB network errors
     function playNativeTTS(text, icon) {
       window.speechSynthesis.cancel();
 
@@ -2459,7 +2625,6 @@
         voices.find(v => v.name.includes("Samantha")) ||
         voices.find(v => v.lang === "en-US");
 
-      // Basic chunking to prevent Chrome from stopping randomly on long texts
       const chunks = text.match(/[^.!?\n]+[.!?\n]*/g) || [text];
       let currentIndex = 0;
 
